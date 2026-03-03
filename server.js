@@ -1,7 +1,7 @@
-import express from 'express';
-import { fileURLToPath } from 'url';
+import express from 'express'; // import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';   
 import path from 'path';
-
+import { testConnection } from './src/models/db.js';  // import { router } from './src/routes/index.js';
 // Define the the application environment
 const NODE_ENV = process.env.NODE_ENV?.toLowerCase() || '.env no found';
 
@@ -59,7 +59,12 @@ app.get('/categories', async (req, res) => {
     res.render('categories', { title, h1, button, h2, p, p2, p3, a, a2, a3 });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running at http://127.0.0.1:${PORT}`);
-  console.log(`Environment: ${NODE_ENV}`);
+app.listen(PORT, async () => {
+  try {
+    await testConnection();
+    console.log(`Server is running at http://127.0.0.1:${PORT}`);
+    console.log(`Environment: ${NODE_ENV}`);
+  } catch (error) {
+    console.error('Error connecting to the database:', error);
+  }
 });
