@@ -30,9 +30,9 @@ body {
   --shadow-md: 0 6px 20px rgba(2, 6, 23, 0.08);
 
   /* Colors */
-  --color-bg: #1c4197;       /* header/footer background */
+  --color-bg: rgb(0, 110, 182);       /* header/footer background */
   --color-accent: #2563eb;   /* brand accent */
-  --color-text: #ffffff;     /* text on dark bg */
+  --color-text: #fff;     /* text on dark bg */
   --color-text-dark: #0f172a;/* text on light bg */
   --color-text-light: #9ca3af;
   --surface: #ffffff;
@@ -112,6 +112,7 @@ footer {
 footer p {
   margin: 0;
   color: var(--color-text);
+  font-size: 1.1rem;
 }
 
 /* ========== LINKS ========== */
@@ -119,6 +120,7 @@ footer p {
 main a {
   color: var(--color-accent);
   text-decoration: none;
+  font-size: 1.1rem;
 }
 main a:hover,
 main a:focus-visible {
@@ -139,7 +141,7 @@ header ul a:focus-visible {
 /* ========== TYPOGRAPHY ========== */
 h1 {
   margin: 0 0 var(--space-6);
-  font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+  font-size: 1.1rem;
   line-height: 1.2;
   letter-spacing: -0.015em;
   color: var(--color-text-dark);
