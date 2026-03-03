@@ -1,0 +1,249 @@
+/* ========== CSS RESET (lightweight) ========== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.6;
+  color: var(--color-text);
+  background: var(--surface-2);
+}
+
+/* ========== THEME TOKENS ========== */
+:root {
+  --max-w: 1100px;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+
+  --ring: 3px;
+  --radius: 14px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 6px 20px rgba(2, 6, 23, 0.08);
+
+  /* Colors */
+  --color-bg: #1c4197;       /* header/footer background */
+  --color-accent: #2563eb;   /* brand accent */
+  --color-text: #ffffff;     /* text on dark bg */
+  --color-text-dark: #0f172a;/* text on light bg */
+  --color-text-light: #9ca3af;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+
+  --font-family: 'Archivo Black', sans-serif;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface: #0b1220;
+    --surface-2: #0f172a;
+    --color-text-dark: #e5e7eb;
+    --color-text-light: #94a3b8;
+    --shadow-md: 0 6px 20px rgba(0,0,0,0.35);
+  }
+  body {
+    background: var(--surface-2);
+    color: var(--color-text-dark);
+  }
+}
+
+/* ========== LAYOUT ========== */
+html, body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-family);
+  font-size: 1rem;
+  color: var(--color-text-dark);
+  background: var(--surface);
+  margin: 0;
+}
+
+/* Main content */
+main {
+  flex: 1;
+  margin: var(--space-2);
+  padding:  var(--space-1);
+  max-width: var(--max-w);
+  width: 100%;
+}
+
+/* Header */
+header {
+  background: var(--color-bg);
+  padding: var(--space-4);
+}
+
+header ul{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap; /* wrap on small screens */
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 0.75rem; /* compact for Mobile S */
+}
+
+header ul li {
+  margin-left: var(--space-1);
+}
+
+/* Footer */
+footer {
+  background: var(--color-bg);
+  padding: var(--space-4);
+  color: var(--color-text);
+  text-align: center;
+}
+footer p {
+  margin: 0;
+  color: var(--color-text);
+}
+
+/* ========== LINKS ========== */
+/* Global links in main content */
+main a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+main a:hover,
+main a:focus-visible {
+  text-decoration: underline;
+}
+
+/* Header links */
+header ul a {
+  text-decoration: none;
+  color: var(--color-text); /* white on blue */
+}
+header ul a:hover,
+header ul a:focus-visible {
+  color: var(--color-accent); /* bright blue hover */
+  text-decoration: underline;
+}
+
+/* ========== TYPOGRAPHY ========== */
+h1 {
+  margin: 0 0 var(--space-6);
+  font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  color: var(--color-text-dark);
+}
+p {
+  margin: var(--space-4);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-text-dark);
+}
+
+/* ========== BUTTONS ========== */
+button {
+  border-radius: 0.25rem;
+  color: var(--color-text);
+  background: var(--color-text-light);
+  border: none;
+  padding: var(--space-2);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+  margin-top: 10px;
+}
+
+
+/* ========== CATEGORY LIST ========== */
+
+.category-list  {
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+ gap: var(--space-3);
+}
+
+.category-list li {
+  list-style: none;
+  text-align: center;
+  margin: 10px;
+  background: var(--color-text-light);
+  border-radius: 0.25rem;
+  max-width: 150px;
+  transition: background 0.2s ease-in-out;
+}
+.category-list li:hover {
+  background: var(--color-text);
+  color: var(--color-accent);
+}
+.organization li {
+   list-style: none;
+  
+}
+.category-element h2 {
+  font-size: var(--space-6);
+  color: var(--color-accent);
+}
+.category-element a {
+  text-decoration: none;
+  font-size: var(--space-4);
+  padding: var(--space-2);
+  display: block;
+
+  transition: background 0.2s ease-in-out;
+   
+}
+
+.category-element a:hover {
+  color: var(--color-bg);}
+
+
+
+/* ========== RESPONSIVE GRID BREAKPOINTS ========== */
+@media (min-width: 520px) {
+  header ul {
+    font-size: 0.85rem;
+    gap: var(--space-6);
+    justify-content: flex-start;
+  }
+  .category-list{
+    grid-template-columns: repeat(3, 1fr);
+
+  }
+}
+
+@media (min-width: 640px) {
+  header ul {
+    font-size: 1rem;
+  }
+  .category-list{
+    grid-template-columns: repeat(2, 1fr);
+   }
+}
+
+@media (min-width: 768px) {
+  .category-list{
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  header ul {
+    font-size: 1rem;
+    gap: var(--space-8);
+  }
+  .category-list{
+   grid-template-columns: auto-fit(100px 1fr );
+  }
+}
+

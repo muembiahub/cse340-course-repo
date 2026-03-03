@@ -41,11 +41,23 @@ app.get('/organizations', async (req, res) => {
 
 app.get('/projects', async (req, res) => {
     const title = 'Service Projects';
-    const h1 = 'Upcoming Service Projects'
-    const button = 'Learn More'
-    res.render('projects', { title , h1,button });
+    const button = 'View All';
+    res.render('projects', { title, button });
 });
 
+app.get('/categories', async (req, res) => {
+    const title = 'Our Category Page';
+    const h1 = 'Categories'
+    const button = 'View All'
+    const h2 = 'We have a variety of categories to choose from'
+    const p = 'You can choose from a variety of categories to find the service project that is right for you'
+    const p2 = 'We have a variety of categories to choose from'
+    const p3 = 'If you are looking for a specific category, you can search for it using the search bar above'
+    const a = 'Learn More'
+    const a2 = 'Select a Category'
+    const a3 = 'Search for a Category'
+    res.render('categories', { title, h1, button, h2, p, p2, p3, a, a2, a3 });
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running at http://127.0.0.1:${PORT}`);
