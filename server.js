@@ -36,7 +36,8 @@ app.get('/', async (req, res) => {
 
 app.get('/organizations', async (req, res) => {
     const title = 'Our Partner Organizations';
-    res.render('organizations', { title });
+    const button = 'View All';
+    res.render('organizations', { title, button });
 });
 
 app.get('/projects', async (req, res) => {

@@ -1,6 +1,14 @@
     <footer>
         <p>&copy; <%= new Date().getFullYear() %> CSE 340 Service Network.</p>
-        <p><%= new Date().toLocaleString() %></p>
+        <p><%= new Date().toLocaleString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric', 
+    hour: '2-digit', 
+    minute: '2-digit' 
+}) %></p>
+
 
 
     </footer>
