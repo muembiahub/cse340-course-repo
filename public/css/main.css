@@ -134,7 +134,7 @@ header ul a {
 }
 header ul a:hover,
 header ul a:focus-visible {
-  color: var(--color-accent); /* bright blue hover */
+  color: var(--color-text-dark); /* bright blue hover */
   text-decoration: underline;
 }
 
