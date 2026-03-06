@@ -179,7 +179,7 @@ button.pulse {
   animation: fadeInUp 0.6s ease-out, gradientShift 6s ease infinite, pulse 2s ease-in-out infinite;
 }
 
-/* ========== CATEGORY SECTION ========== */
+/* ========== CATEGORY SECTION ==========
 .category-element {
   margin: var(--space-6) 0;
   animation: fadeIn 0.8s ease-in-out;
@@ -243,6 +243,7 @@ button.pulse {
 }
 
 /* ========== KEYFRAME ANIMATIONS ========== */
+/* 
 @keyframes fadeInUp {
   from { transform: translateY(20px); opacity: 0; }
   to   { transform: translateY(0); opacity: 1; }
@@ -273,7 +274,173 @@ button.pulse {
   0%   { background-position: 0% 50%; }
   50%  { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
+} */
+
+
+/* ========== ORGANIZATION LIST ========== */
+.organization-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
 }
+
+.organization-item {
+  background: #f9fafb; /* couleur douce */
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 1rem;
+  text-align: center;
+}
+
+.organization-logo {
+  width: 80px;
+  height: auto;
+  margin-bottom: 0.5rem;
+}
+
+.organization-info h3 {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+  color: #111827; /* gris foncé */
+}
+
+.organization-info p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* ========== EMAIL LINKS ========== */
+.organization-info a {
+  color: #2563eb; /* bleu accent */
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.organization-info a:hover,
+.organization-info a:focus-visible {
+  text-decoration: underline;
+}
+
+/* Supprimer la décoration par défaut des listes */
+.project-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.project-list li {
+  text-decoration: none;
+}
+
+/* Style des cartes projet */
+.project-item {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.project-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Titre du projet */
+.project-item h2 {
+  margin-top: 0;
+  font-size: 1.4rem;
+  text-align: center;
+}
+
+/* Texte du projet */
+.project-item p {
+  margin: 0.3rem 0;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.project-item strong {
+  color: #333;
+}
+
+/* Email cliquable avec icône 📧 */
+.project-item a {
+  color: #0078d7;
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: color 0.3s ease;
+}
+
+.project-item a:hover {
+  text-decoration: underline;
+  color: #005a9e;
+}
+
+/* Animation subtile sur l’icône 📧 */
+.project-item a::before {
+  content: "📧";
+  transition: transform 0.3s ease;
+}
+
+.project-item a:hover::before {
+  transform: scale(1.2);
+}
+
+
+/*  ===================== category ================= */
+
+.category-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.category-list li {
+  background: #f0f4f8;
+  border-radius: 8px;
+  padding: 0.75rem 1.25rem;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+/* Hover effect */
+.category-list li:hover {
+  background: #d9e8ff;
+  transform: scale(1.05);
+}
+
+/* Loader animation */
+.loader__element {
+  animation: fadeInUp 0.6s ease forwards;
+  opacity: 0;
+}
+
+@keyframes fadeInUp {
+  from {
+    transform: translateY(15px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 
 
 /* ========== RESPONSIVE GRID BREAKPOINTS ========== */

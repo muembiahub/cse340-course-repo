@@ -1,25 +1,12 @@
 <%- include('partials/header') %>
 
 <main>
-     <h1><%= h1 %></h1>
-    <ul class="category-list">
-    <li class="loader__element">Environmental</li>
-    <li class="loader__element">Educational</li>
-    <li class="loader__element">Community Service</li>
-    <li class="loader__element">Health and Wellness</li>
-    </ul>
-        <button class="pulse"><%= button %></button>
-    <div class="category-element">
-  <h2><%= h2 %></h2>
+  <h1><%= title %></h1>
   <ul class="category-list">
-    <li><%= p %> <a href="#/"><%= a %></a></li>
-    <li><%= p2 %> <a href="#/"><%= a2 %></a></li>
-    <li><%= p3 %> <a href="#/"><%= a3 %></a></li>
+    <% categories.forEach(category => { %>
+      <li class="loader__element" ><%= category.category_name %></li>
+    <% }) %>
   </ul>
-</div>
-
-
 </main>
 
 <%- include('partials/footer') %>
-

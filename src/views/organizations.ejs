@@ -1,13 +1,35 @@
 <%- include('partials/header') %>
-    <main>
-            
-<p>Here are a few of our partner organizations:</p>
-<ul class="organization">
-    <li><img src="/images/brightfuture-logo.png" alt="BrightFuture Builders logo"><strong>BrightFuture Builders</strong>: info@brightfuture.org</li>
-    <li><img src="/images/greenharvest-logo.png" alt="GreenHarvest Growers logo"><strong>GreenHarvest Growers</strong>: contact@greenharvest.org</li>
-    <li><img src="/images/unityserve-logo.png" alt="UnityServe Volunteers logo"><strong>UnityServe Volunteers</strong>: hello@unityserve.org</li>
-</ul>
-<button class="pulse"><%= button %></button>
 
-    </main>
+<main>  
+  <section class="organizations">
+    <h2>Our Partner Organizations</h2>
+    <p>Here are a few of our partner organizations:</p>
+    <ul class="organization-list">
+      <% organizations.forEach(organization => { %>
+        <li class="organization-item">
+          <img 
+            src="/images/<%= organization.logo_filename %>" 
+            alt="<%= organization.name %> logo" 
+            class="organization-logo"
+          >
+          <div class="organization-info">
+            <h3><%= organization.name %></h3>
+            <p>
+              Contact: 
+              <a href="mailto:<%= organization.contact_email %>">
+                <%= organization.contact_email %>
+              </a>
+            </p>
+          </div>
+        </li>
+      <% }); %>
+    </ul>
+  </section>
+
+  <section class="get-involved">
+    <h2>Get Involved</h2>
+    <button class="pulse" aria-label="Get involved"><%= button %></button>
+  </section>
+</main>
+
 <%- include('partials/footer') %>

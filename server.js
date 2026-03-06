@@ -1,7 +1,13 @@
 import express from 'express'; // import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';   
 import path from 'path';
-import { testConnection } from './src/models/db.js';  // import { router } from './src/routes/index.js';
+import { testConnection } from './src/models/db.js';
+// import data from './src/models/organizations.js';
+import { getAllOrganizations } from './src/models/organizations.js';
+//   import { getAllServiceProjectsWithOrganizations } from './src/models/projects.js';
+import { getAllServiceProjectsWithOrganizations } from './src/models/projects.js';
+
+import {getAllCategories} from './src/models/categories.js';
 // Define the the application environment
 const NODE_ENV = process.env.NODE_ENV?.toLowerCase() || '.env no found';
 
@@ -35,29 +41,26 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/organizations', async (req, res) => {
+    const organizations = await getAllOrganizations();
     const title = 'Our Partner Organizations';
-    const button = 'View All';
-    res.render('organizations', { title, button });
+    const button = 'Get Involved';
+    res.render('organizations', { title,organizations, button });
 });
 
 app.get('/projects', async (req, res) => {
-    const title = 'Service Projects';
-    const button = 'View All';
-    res.render('projects', { title, button });
+  const allProjects = await getAllServiceProjectsWithOrganizations();
+  const title = 'Our Projects';
+  const button = 'Get Involved';
+  res.render('projects', { title, projects: allProjects, button });
 });
 
+
+
 app.get('/categories', async (req, res) => {
+   const allCategories = await getAllCategories();
+   console.log(allCategories);
     const title = 'Our Category Page';
-    const h1 = 'Categories'
-    const button = 'View All'
-    const h2 = 'We have a variety of categories to choose from'
-    const p = 'You can choose from a variety of categories to find the service project that is right for you'
-    const p2 = 'We have a variety of categories to choose from'
-    const p3 = 'If you are looking for a specific category, you can search for it using the search bar above'
-    const a = 'Learn More'
-    const a2 = 'Select a Category'
-    const a3 = 'Search for a Category'
-    res.render('categories', { title, h1, button, h2, p, p2, p3, a, a2, a3 });
+    res.render('categories', { title, categories: allCategories });
 });
 
 app.listen(PORT, async () => {
