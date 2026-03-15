@@ -7,7 +7,13 @@
     day: 'numeric', 
     hour: '2-digit', 
     minute: '2-digit' 
-}) %></p>
+}) %>
+</p>
+<p>
+      <% if (NODE_ENV === 'development') { %>
+            (Development mode)
+        <% } %>
+</p>
 
 
 

@@ -1,6 +1,6 @@
 import db from './db.js'
 
-const getAllServiceProjectsWithOrganizations = async () => {
+const getAllProjects = async () => {
   const query = `
     SELECT 
       ser.project_id,
@@ -14,7 +14,8 @@ const getAllServiceProjectsWithOrganizations = async () => {
       org.logo_filename
     FROM service_projects ser
     JOIN organization org 
-      ON ser.organization_id = org.organization_id;
+      ON ser.organization_id = org.organization_id
+    order by org.name;
   `;
 
   try {
@@ -26,4 +27,22 @@ const getAllServiceProjectsWithOrganizations = async () => {
   }
 };
 
-export { getAllServiceProjectsWithOrganizations };
+const getProjectsByOrganizationId = async (organizationId) => {
+      const query = `
+        SELECT
+          project_id,
+          organization_id,
+          title,
+          description,
+          location
+        FROM service_projects
+        WHERE organization_id = $1
+        order by title;
+      `;
+      
+      const query_params = [organizationId];
+      const result = await db.query(query, query_params);
+
+      return result.rows;
+};
+export { getAllProjects, getProjectsByOrganizationId };
