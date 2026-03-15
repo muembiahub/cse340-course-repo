@@ -10,8 +10,8 @@ import { testErrorPage } from './errors.js';
 const router = express.Router();
 
 router.get('/', showHomePage);
-router.get('/organizations', showOrganizationsPage);
-router.get('/organization/:id', showOrganizationDetailsPage);
+router.get('/organizationslist', showOrganizationsPage);
+router.get('/organizationdetails/:id', showOrganizationDetailsPage);
 router.get('/projects', showProjectsPage);
 router.get('/categories', showCategoriesPage);
 
