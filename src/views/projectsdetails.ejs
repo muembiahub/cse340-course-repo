@@ -1,11 +1,8 @@
 <%- include('partials/header') %>
 <main class="container">
   <h1><%= title %></h1>
-  <p class="subtitle">Discover our latest community service projects and how you can contribute.</p>
   <section class="projects">
-    <h2>Service Projects</h2>
     <ul class="project-list">
-      <% projects.forEach(project => { %>
         <li class="project-item">
           <article>
             <header>
@@ -21,22 +18,10 @@
                   }) %>
             </p>
             <p>
-              <strong>Contact:</strong><a href="mailto:<%= project.contact_email %>?subject=Interested in <%= project.project_title %>">
-                <%= project.contact_email %>
-              </a>
+              <strong>Organization:</strong><a href="/organizationdetails/<%= project.organization_id %>"> <%= project.organization_name %></a>
             </p>
-            <% if (project.logo_filename) { %>
-                <p>
-                  <strong>Organization Logo:</strong> 
-                  <img src="<%= project.logo_filename %>" alt="<%= project.organization_name %> Logo" width="100" height="100">
-                </p>
-                 <% } %>
-              
-            <p> <strong>Organization:</strong><a href="/organizationdetails/<%= project.organization_id %>"><%= project.organization_name %></a> </p>
-           
           </article>
         </li>
-      <% }); %>
     </ul>
   </section>
 
