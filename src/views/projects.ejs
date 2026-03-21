@@ -31,6 +31,11 @@
                   <img src="<%= project.logo_filename %>" alt="<%= project.organization_name %> Logo" width="100" height="100">
                 </p>
                  <% } %>
+                    <p><strong>Categories: </strong>
+  <% project.category_names.forEach((cat, i) => { %>
+    <a href="/categorydetails/<%= project.category_ids[i] %>"><%= cat %></a>
+  <% }) %>
+</p>
               
             <p> <strong>Organization:</strong><a href="/organizationdetails/<%= project.organization_id %>"><%= project.organization_name %></a> </p>
            

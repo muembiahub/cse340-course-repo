@@ -4,7 +4,11 @@
   <h1><%= title %></h1>
   <ul class="category-list">
     <% categories.forEach(category => { %>
-      <li class="loader__element" ><%= category.category_name %></li>
+      <li class="loader__element">
+        <a href="/categorydetails/<%= category.category_id %>">
+          <%= category.category_name %>
+        </a>
+      </li>
     <% }) %>
   </ul>
 </main>
