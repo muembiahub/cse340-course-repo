@@ -71,7 +71,8 @@ main {
   margin: 0 auto; /* centre le contenu */
   padding: var(--space-4);
 }
-
+a{text-decoration: none;}
+a:hover{color: var(--color-accent);}
 /* Header & Footer */
 header, footer {
   width: 100%;          /* occupe toute la largeur */
@@ -98,6 +99,19 @@ header nav ul {
 header nav ul li {
   margin-left: var(--space-1);
 }
+header nav ul li a {
+  color: var(--color-text);
+  text-decoration: none;
+  font-weight: bold;
+  font-size: var(--space-6);
+  padding: var(--space-1);
+  border-radius: var(--radius);
+  transition: all 0.2s ease-in-out;
+}
+
+header nav ul li a:hover {
+  background: var(--color-text-dark);
+}
 
 footer {
   background: var(--color-bg);
@@ -112,28 +126,6 @@ footer p {
   font-size: 1.1rem;
 }
 
-/* ========== LINKS ========== */
-main a {
-  color: var(--color-accent);
-  text-decoration: none;
-  font-size: 1.1rem;
-  transition: color 0.3s ease, text-decoration 0.3s ease;
-}
-main a:hover,
-main a:focus-visible {
-  text-decoration: underline;
-}
-
-header nav ul a {
-  text-decoration: none;
-  color: var(--color-text);
-  transition: color 0.3s ease, text-decoration 0.3s ease;
-}
-header nav ul a:hover,
-header nav ul a:focus-visible {
-  color: var(--color-text-dark);
-  text-decoration: underline;
-}
 
 /* ========== TYPOGRAPHY ========== */
 h1 {
@@ -179,102 +171,6 @@ button.pulse {
   animation: fadeInUp 0.6s ease-out, gradientShift 6s ease infinite, pulse 2s ease-in-out infinite;
 }
 
-/* ========== CATEGORY SECTION ==========
-.category-element {
-  margin: var(--space-6) 0;
-  animation: fadeIn 0.8s ease-in-out;
-}
-
-.category-element h2 {
-  font-size: var(--space-6);
-  color: var(--color-accent);
-  margin-bottom: var(--space-4);
-  text-align: center;
-  animation: slideDown 0.6s ease-out;
-}
-
-.category-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: var(--space-2);
-  margin: var(--space-3) 0;
-  padding: 0;
-}
-
-.category-list li {
-  list-style: none;
-  background: var(--color-text-light);
-  border-radius: var(--radius);
-  padding: var(--space-1);
-  text-align: center;
-  transition: background 0.3s ease, color 0.3s ease;
-  opacity: 0;
-}
-
-.category-list li:nth-child(1) {
-  animation: popUp 0.6s ease-in-out 0s forwards, pulse 2s ease-in-out 1s infinite;
-}
-.category-list li:nth-child(2) {
-  animation: popUp 0.6s ease-in-out 0.3s forwards, pulse 2s ease-in-out 1.3s infinite;
-}
-.category-list li:nth-child(3) {
-  animation: popUp 0.6s ease-in-out 0.6s forwards, pulse 2s ease-in-out 1.6s infinite;
-}
-.category-list li:nth-child(4) {
-    animation: popUp 0.6s ease-in-out 0.6s forwards, pulse 2s ease-in-out 1.6s infinite;
-}
-
-.category-list li:hover {
-  background: var(--color-text);
-  color: var(--color-accent);
-  transform: scale(1.05);
-}
-
-.category-element a {
-  text-decoration: none;
-  font-size: var(--space-4);
-  display: block;
-  padding: var(--space-2);
-  transition: color 0.2s ease-in-out;
-}
-
-.category-element a:hover {
-  color: var(--color-bg);
-}
-
-/* ========== KEYFRAME ANIMATIONS ========== */
-/* 
-@keyframes fadeInUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes slideDown {
-  from { transform: translateY(-20px); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes popUp {
-  from { transform: scale(0.95); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
-}
-
-@keyframes pulse {
-  0%   { transform: scale(1); opacity: 1; }
-  50%  { transform: scale(1.05); opacity: 0.9; }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-@keyframes gradientShift {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-} */
 
 
 /* ========== ORGANIZATION LIST ========== */
@@ -353,10 +249,19 @@ button.pulse {
 }
 
 /* Titre du projet */
-.project-item h2 {
+.project-item  h2 a {
   margin-top: 0;
+  color: black;
   font-size: 1.4rem;
   text-align: center;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  text-decoration: none;
+  font-weight: 100;
+}
+.project-item  h2 a:hover {
+  text-decoration: underline;
 }
 
 /* Texte du projet */
@@ -371,7 +276,7 @@ button.pulse {
 }
 
 /* Email cliquable avec icône 📧 */
-.project-item a {
+.project-item-links a {
   color: #0078d7;
   text-decoration: none;
   font-weight: 500;
@@ -381,18 +286,18 @@ button.pulse {
   transition: color 0.3s ease;
 }
 
-.project-item a:hover {
+.project-item-links a:hover {
   text-decoration: underline;
   color: #005a9e;
 }
 
 /* Animation subtile sur l’icône 📧 */
-.project-item a::before {
+.project-item-links a::before {
   content: "📧";
   transition: transform 0.3s ease;
 }
 
-.project-item a:hover::before {
+.project-item-links a:hover::before {
   transform: scale(1.2);
 }
 

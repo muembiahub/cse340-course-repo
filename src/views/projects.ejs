@@ -9,7 +9,7 @@
         <li class="project-item">
           <article>
             <header>
-              <h2><%= project.project_title %></h2>
+              <h2> <a href="/projectsdetails/<%= project.project_id %>"><%= project.project_title %></a></h2>
             </header>
             <p><strong>Description:</strong> <%= project.description %></p>
             <p><strong>Location:</strong> <%= project.location %></p>
@@ -20,6 +20,7 @@
                     day: 'numeric' 
                   }) %>
             </p>
+            <div  class="project-item-links">
             <p>
               <strong>Contact:</strong><a href="mailto:<%= project.contact_email %>?subject=Interested in <%= project.project_title %>">
                 <%= project.contact_email %>
@@ -38,7 +39,7 @@
 </p>
               
             <p> <strong>Organization:</strong><a href="/organizationdetails/<%= project.organization_id %>"><%= project.organization_name %></a> </p>
-           
+            </div>
           </article>
         </li>
       <% }); %>
