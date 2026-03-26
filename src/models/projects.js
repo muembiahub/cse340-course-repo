@@ -87,37 +87,37 @@ LIMIT $1;
 const getProjectsDetailsById = async (projectId) => {
   const query = `
     SELECT 
-  ser.project_id,
-  ser.title AS project_title,
-  ser.description,
-  ser.location,
-  ser.project_date,
-  ser.organization_id,
-  org.name AS organization_name,
-  org.contact_email,
-  array_agg(c.category_id) AS category_ids,
-  array_agg(c.name) AS category_names
-FROM service_projects ser
-JOIN organization org 
-  ON ser.organization_id = org.organization_id
-JOIN serviceprojectscategories cat
-  ON ser.project_id = cat.project_id
-JOIN categories c
-  ON cat.category_id = c.category_id
-GROUP BY ser.project_id, ser.title, ser.description, ser.location, ser.project_date, ser.organization_id, org.name, org.contact_email
-ORDER BY ser.project_date ASC
-LIMIT $1;
+      ser.project_id,
+      ser.title AS project_title,
+      ser.description,
+      ser.location,
+      ser.project_date,
+      ser.organization_id,
+      org.name AS organization_name,
+      org.contact_email,
+      array_agg(c.category_id) AS category_ids,
+      array_agg(c.name) AS category_names
+    FROM service_projects ser
+    JOIN organization org 
+      ON ser.organization_id = org.organization_id
+    JOIN serviceprojectscategories cat
+      ON ser.project_id = cat.project_id
+    JOIN categories c
+      ON cat.category_id = c.category_id
+    WHERE ser.project_id = $1
+    GROUP BY ser.project_id, ser.title, ser.description, ser.location, ser.project_date, ser.organization_id, org.name, org.contact_email
+    ORDER BY ser.project_date ASC
+    LIMIT 1;
   `;
 
-  const query_params = [projectId];
-
   try {
-    const result = await db.query(query, query_params);
-    return result.rows[0]; // return a single project object
+    const result = await db.query(query, [projectId]);
+    return result.rows[0]; // retourne un seul projet
   } catch (err) {
     console.error('Error fetching project details:', err);
     throw err;
   }
 };
+
 
 export { getAllProjects,getUpcomingProjects, getProjectsByOrganizationId, getProjectsDetailsById };

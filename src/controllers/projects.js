@@ -10,12 +10,26 @@ const showProjectsPage = async (req, res) => {
     res.render('projects', { title, projects , button });
 };
 const showProjectDetailsPage = async (req, res) => {
+  try {
     const project = await getProjectsDetailsById(req.params.id);
-    const title = 'Project Details';
-    const button = 'Edit Project'
 
-    res.render('projectsdetails', { title, project , button });
+    // Comme getProjectsDetailsById retourne un tableau, on prend la première ligne
+    const projectData = project ? project : null;
+
+    const title = 'Project Details';
+    const button = 'Edit Project';
+
+    if (!projectData) {
+      return res.status(404).render('error', { message: 'Projet introuvable' });
+    }
+
+    res.render('projectsdetails', { title, project: projectData, button });
+  } catch (err) {
+    console.error('Error showing project details:', err);
+    res.status(500).render('error', { message: 'Erreur serveur lors du chargement du projet' });
+  }
 };
+
 
 // Export any controller functions
 export { showProjectsPage , showProjectDetailsPage};
