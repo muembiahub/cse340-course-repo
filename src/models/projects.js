@@ -1,31 +1,4 @@
-import db from './db.js'
-
-const getAllProjects = async () => {
-  const query = `
-    SELECT 
-      ser.project_id,
-      ser.title As project_title,
-      ser.description,
-      ser.location,
-      ser.project_date,
-      ser.organization_id,
-      org.name AS organization_name,
-      org.contact_email,
-      org.logo_filename
-    FROM service_projects ser
-    JOIN organization org 
-      ON ser.organization_id = org.organization_id
-    order by org.name;
-  `;
-
-  try {
-    const result = await db.query(query);
-    return result.rows;
-  } catch (err) {
-    console.error('Error fetching service projects with organizations:', err);
-    throw err;
-  }
-};
+import db from './db.js';
 
 const getProjectsByOrganizationId = async (organizationId) => {
       const query = `
@@ -83,8 +56,7 @@ LIMIT $1;
   }
 };
 
-
-const getProjectsDetailsById = async (projectId) => {
+const getProjectsDetails = async (projectId) => {
   const query = `
     SELECT 
       ser.project_id,
@@ -98,26 +70,117 @@ const getProjectsDetailsById = async (projectId) => {
       array_agg(c.category_id) AS category_ids,
       array_agg(c.name) AS category_names
     FROM service_projects ser
-    JOIN organization org 
+    LEFT JOIN organization org 
       ON ser.organization_id = org.organization_id
-    JOIN serviceprojectscategories cat
+    LEFT JOIN serviceprojectscategories cat
       ON ser.project_id = cat.project_id
-    JOIN categories c
+    LEFT JOIN categories c
       ON cat.category_id = c.category_id
     WHERE ser.project_id = $1
     GROUP BY ser.project_id, ser.title, ser.description, ser.location, ser.project_date, ser.organization_id, org.name, org.contact_email
-    ORDER BY ser.project_date ASC
-    LIMIT 1;
+    ORDER BY ser.project_date ASC;
   `;
 
   try {
     const result = await db.query(query, [projectId]);
-    return result.rows[0]; // retourne un seul projet
+
+    if (result.rows.length === 0) return null;
+
+    const row0 = result.rows[0];
+
+    return {
+      project_id: row0.project_id,
+      project_title: row0.project_title,
+      description: row0.description,
+      location: row0.location,
+      project_date: row0.project_date,
+      organization_id: row0.organization_id,
+      organization_name: row0.organization_name,
+      contact_email: row0.contact_email,
+      category_ids: row0.category_ids || [],
+      category_names: row0.category_names || []
+    };
   } catch (err) {
-    console.error('Error fetching project details:', err);
+    console.error("Error fetching project details:", err);
     throw err;
   }
 };
 
 
-export { getAllProjects,getUpcomingProjects, getProjectsByOrganizationId, getProjectsDetailsById };
+
+const createProject = async (title, description, location, date, organizationId) => {
+    const query = `
+      INSERT INTO service_projects (title, description, location, project_date, organization_id)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING project_id;
+    `;
+
+    const query_params = [title, description, location, date, organizationId];
+
+    try {
+        const result = await db.query(query, query_params);
+
+        if (result.rows.length === 0) {
+            throw new Error('Failed to create project');
+        }
+
+        if (process.env.ENABLE_SQL_LOGGING === 'true') {
+            console.log('Created new project with ID:', result.rows[0].project_id);
+        }
+
+        return result.rows[0].project_id;
+    } catch (err) {
+        console.error('Database error creating project:', err.message);
+        console.error('Full error object:', err); // shows details like code, detail, hint
+        throw err; // rethrow so controller can handle
+    }
+};
+const updateProject = async (projectId, title, description, location, date, organizationId) => {
+  const query = `
+    UPDATE service_projects
+    SET title = $1, description = $2, location = $3, project_date = $4, organization_id = $5
+    WHERE project_id = $6
+    RETURNING project_id;
+  `;
+  const params = [title, description, location, date, organizationId, projectId];
+
+  // Debug log
+  console.log("Executing updateProject with params:", params);
+
+  try {
+    const result = await db.query(query, params);
+    if (result.rows.length === 0) throw new Error('Failed to update project');
+    if (process.env.ENABLE_SQL_LOGGING === 'true') {
+      console.log('Updated project with ID:', result.rows[0].project_id);
+    }
+  } catch (err) {
+    console.error('Database error updating project:', err.message);
+    throw err;
+  }
+};
+
+
+const updateProjectCategories = async (projectId, categories) => {
+  console.log("Updating categories for project:", projectId, "with categories:", categories);
+
+  await db.query(`DELETE FROM serviceprojectscategories WHERE project_id = $1`, [projectId]);
+
+  if (Array.isArray(categories)) {
+    for (const categoryId of categories) {
+      console.log("Inserting category link:", projectId, categoryId);
+      await db.query(
+        `INSERT INTO serviceprojectscategories (project_id, category_id) VALUES ($1, $2)`,
+        [projectId, categoryId]
+      );
+    }
+  }
+};
+
+
+
+export {getUpcomingProjects,
+   getProjectsByOrganizationId,
+    getProjectsDetails,
+     createProject,
+     updateProject,
+     updateProjectCategories};

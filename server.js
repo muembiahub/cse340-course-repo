@@ -1,5 +1,7 @@
 import express from 'express';
+import session from 'express-session';
 import { fileURLToPath } from 'url';
+import flash from './src/middleware/flash.js';
 import path from 'path';
 import { testConnection } from './src/models/db.js';
 import router from './src/controllers/routes.js';
@@ -18,6 +20,18 @@ const app = express();
 /**
   * Configure Express middleware
   */
+app.use(session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge: 60 * 60 * 1000 } // Session expires after 1 hour of inactivity
+}));
+// Use flash message middleware
+app.use(flash);
+
+// Allow Express to receive and process common POST data
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));

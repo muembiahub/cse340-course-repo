@@ -1,56 +1,129 @@
-<%- include('partials/header') %>
-<main class="container">
-  <h1><%= title %></h1>
-  <p class="subtitle">Discover our latest community service projects and how you can contribute.</p>
-  <section class="projects">
-    <h2>Service Projects</h2>
-    <ul class="project-list">
-      <% projects.forEach(project => { %>
-        <li class="project-item">
-          <article>
-            <header>
-              <h2> <a href="/projectsdetails/<%= project.project_id %>"><%= project.project_title %></a></h2>
-            </header>
-            <p><strong>Description:</strong> <%= project.description %></p>
-            <p><strong>Location:</strong> <%= project.location %></p>
-            <p><strong>Date:</strong> 
-              <%= new Date(project.project_date).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  }) %>
-            </p>
-            <div  class="project-item-links">
-            <p>
-              <strong>Contact:</strong><a href="mailto:<%= project.contact_email %>?subject=Interested in <%= project.project_title %>">
-                <%= project.contact_email %>
-              </a>
-            </p>
-            <% if (project.logo_filename) { %>
-                <p>
-                  <strong>Organization Logo:</strong> 
-                  <img src="<%= project.logo_filename %>" alt="<%= project.organization_name %> Logo" width="100" height="100">
-                </p>
-                 <% } %>
-                    <p><strong>Categories: </strong>
-  <% project.category_names.forEach((cat, i) => { %>
-    <a href="/categorydetails/<%= project.category_ids[i] %>"><%= cat %></a>
-  <% }) %>
-</p>
-              
-            <p> <strong>Organization:</strong><a href="/organizationdetails/<%= project.organization_id %>"><%= project.organization_name %></a> </p>
-            </div>
-          </article>
-        </li>
-      <% }); %>
-    </ul>
-  </section>
+<%- include('partials/header', { title: 'Community Service Projects' }) %>
 
-  <section class="get-involved">
-    <h2>Get Involved</h2>
-    <p>Join us in making a difference. Click below to explore opportunities and participate in our initiatives.</p>
-    <button class="pulse"><%= button %></button>
-  </section>
+<main class="container my-5">
+  <h1 class="mb-3"><%= title %></h1>
+  <p class="subtitle text-muted">Discover our latest community service projects and how you can contribute.</p>
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs" id="projectTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="list-tab" data-bs-toggle="tab" data-bs-target="#list" type="button" role="tab" aria-controls="list" aria-selected="true">
+        <i class="fa-solid fa-list me-1"></i> Projects List
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="add-tab" data-bs-toggle="tab" data-bs-target="#add" type="button" role="tab" aria-controls="add" aria-selected="false">
+        <i class="fa-solid fa-plus me-1"></i> Add Project
+      </button>
+    </li>
+  </ul>
+
+  <!-- Tab Content -->
+  <div class="tab-content mt-4" id="projectTabsContent">
+    <!-- Projects List -->
+    <div class="tab-pane fade show active" id="list" role="tabpanel" aria-labelledby="list-tab">
+      <section class="projects mt-4">
+        <div class="row g-4">
+          <% projects.forEach(project => { %>
+            <div class="col-md-6 col-lg-4">
+              <div class="card h-100 shadow-sm project-item">
+                <div class="card-body d-flex flex-column">
+                  <h5 class="card-title">
+                    <a href="/projectsdetails/<%= project.project_id %>">
+                      <%= project.project_title %>
+                    </a>
+                  </h5>
+                  <p class="card-text"><strong>Description:</strong> <%= project.description %></p>
+                  <p class="card-text"><strong>Location:</strong> <%= project.location %></p>
+                  <p class="card-text"><strong>Date:</strong>
+                    <%= new Date(project.project_date).toLocaleDateString('en-US', { 
+                          year: 'numeric', 
+                          month: 'long', 
+                          day: 'numeric' 
+                        }) %>
+                  </p>
+
+                  <p class="card-text">
+                    <strong>Contact:</strong>
+                    <a href="mailto:<%= project.contact_email %>?subject=Interested in <%= project.project_title %>">
+                      <%= project.contact_email %>
+                    </a>
+                  </p>
+
+                  <% if (project.logo_filename) { %>
+                    <div class="text-center mb-2">
+                      <img src="<%= project.logo_filename %>" alt="<%= project.organization_name %> Logo" class="img-fluid rounded" style="max-height:100px;">
+                    </div>
+                  <% } %>
+
+                  <p class="card-text">
+                    <strong>Categories:</strong>
+                    <% project.category_names.forEach((cat, i) => { %>
+                      <a href="/categorydetails/<%= project.category_ids[i] %>" class="badge bg-primary me-1"><%= cat %></a>
+                    <% }) %>
+                  </p>
+
+                  <p>
+                    <a href="/assign-categories/<%= project.project_id %>" class="btn btn-sm btn-outline-primary">Edit Categories</a>
+                  </p>
+
+                  <p class="mt-auto">
+                    <strong>Organization:</strong>
+                    <a href="/organizationdetails/<%= project.organization_id %>">
+                      <%= project.organization_name %>
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      </section>
+    </div>
+
+    <!-- Add Project -->
+    <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
+      <section class="get-involved mt-4">
+        <h2 class="mb-3">Add New Project</h2>
+        <form action="/new-project" method="POST" class="styled-form needs-validation" novalidate>
+          <div class="form-group mb-3">
+            <label for="projectTitle" class="form-label">
+              <i class="fa-solid fa-heading me-1"></i> Project Title
+            </label>
+            <input type="text" id="projectTitle" name="projectTitle" class="form-control" maxlength="150" required>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="description" class="form-label">
+              <i class="fa-solid fa-align-left me-1"></i> Description
+            </label>
+            <textarea id="description" name="description" class="form-control" maxlength="500" rows="4" required></textarea>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="location" class="form-label">
+              <i class="fa-solid fa-location-dot me-1"></i> Location
+            </label>
+            <input type="text" id="location" name="location" class="form-control" maxlength="150" required>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="contactEmail" class="form-label">
+              <i class="fa-solid fa-envelope me-1"></i> Contact Email
+            </label>
+            <input type="email" id="contactEmail" name="contactEmail" class="form-control" maxlength="255" required>
+          </div>
+
+          <button type="submit" class="btn btn-success pulse">
+            <i class="fa-solid fa-check me-1"></i> Create Project
+          </button>
+        </form>
+      </section>
+    </div>
+  </div>
 </main>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <%- include('partials/footer') %>

@@ -1,16 +1,36 @@
-<%- include('partials/header') %>
+<%- include('partials/header', { title: 'Categories' }) %>
+<main class="bg-light">
+  <div class="container mt-5">
+    <div class="card shadow-lg">
+      <div class="card-header bg-primary text-white d-flex align-items-center">
+        <i class="fa-solid fa-tags me-2"></i>
+        <h3 class="mb-0"><%= title %></h3>
+      </div>
+      <div class="card-body">
+        <% if (categories && categories.length > 0) { %>
+          <ul class="list-group">
+            <% categories.forEach(category => { %>
+              <li class="list-group-item d-flex align-items-center">
+                <i class="fa-solid fa-tag text-secondary me-2"></i>
+                <a href="/categorydetails/<%= category.category_id %>" class="text-decoration-none">
+                  <%= category.category_name %>
+                </a>
+              </li>
+            <% }) %>
+          </ul>
+        <% } else { %>
+          <div class="alert alert-info d-flex align-items-center">
+            <i class="fa-solid fa-circle-info me-2"></i>
+            No categories available.
+          </div>
+        <% } %>
+      </div>
+    </div>
 
-<main>
-  <h1><%= title %></h1>
-  <ul class="category-list">
-    <% categories.forEach(category => { %>
-      <li class="loader__element">
-        <a href="/categorydetails/<%= category.category_id %>">
-          <%= category.category_name %>
-        </a>
-      </li>
-    <% }) %>
-  </ul>
+    <!-- Bouton Add New Category -->
+    <a href="/new-category" class="btn btn-success mt-4 d-inline-flex align-items-center">
+      <i class="fa-solid fa-plus me-1"></i> Add New Category
+    </a>
+  </div>
 </main>
-
 <%- include('partials/footer') %>

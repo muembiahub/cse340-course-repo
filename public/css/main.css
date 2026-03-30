@@ -1,4 +1,4 @@
-/* ========== CSS RESET (lightweight) ========== */
+/* ========== RESET ========== */
 *,
 *::before,
 *::after {
@@ -31,7 +31,6 @@ body {
   --space-8: 2rem;
   --space-12: 3rem;
 
-  --ring: 3px;
   --radius: 14px;
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
   --shadow-md: 0 6px 20px rgba(2, 6, 23, 0.08);
@@ -67,48 +66,47 @@ body {
 main {
   flex: 1;
   max-width: var(--max-w);
-  width: 100%;
-  margin: 0 auto; /* centre le contenu */
+  margin: 0 auto;
   padding: var(--space-4);
 }
-a{text-decoration: none;}
-a:hover{color: var(--color-accent);}
+
+a {
+  text-decoration: none;
+}
+a:hover {
+  color: var(--color-accent);
+}
+
 /* Header & Footer */
 header, footer {
-  width: 100%;          /* occupe toute la largeur */
+  width: 100%;
   box-sizing: border-box;
 }
 
 header {
-  background: var(--color-bg);
   padding: var(--space-4);
+
 }
 
 header nav ul {
   list-style: none;
-  margin: 0;
-  padding: 0;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
   align-items: center;
   gap: var(--space-3);
-  font-size: 0.75rem;
+  margin: 0;
+  padding: 0;
 }
 
-header nav ul li {
-  margin-left: var(--space-1);
-}
 header nav ul li a {
   color: var(--color-text);
-  text-decoration: none;
   font-weight: bold;
   font-size: var(--space-6);
   padding: var(--space-1);
   border-radius: var(--radius);
   transition: all 0.2s ease-in-out;
 }
-
 header nav ul li a:hover {
   background: var(--color-text-dark);
 }
@@ -118,21 +116,18 @@ footer {
   padding: var(--space-4);
   color: var(--color-text);
   text-align: center;
-  box-shadow: 0 -2px 6px rgba(0,0,0,0.1); /* moderne */
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
 }
-
 footer p {
   margin: 0;
   font-size: 1.1rem;
 }
-
 
 /* ========== TYPOGRAPHY ========== */
 h1 {
   margin: 0 0 var(--space-6);
   font-size: 1.1rem;
   line-height: 1.2;
-  letter-spacing: -0.015em;
   color: var(--color-text-dark);
 }
 p {
@@ -147,7 +142,6 @@ button {
   border-radius: 0.25rem;
   color: var(--color-text);
   background: linear-gradient(270deg, var(--color-text-light), var(--color-accent));
-  background-size: 200% 200%;
   border: none;
   padding: var(--space-2);
   font-size: 1rem;
@@ -156,241 +150,43 @@ button {
   transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
   animation: fadeInUp 0.6s ease-out, gradientShift 6s ease infinite;
 }
-
 button:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
-
 button:active {
   transform: scale(0.95);
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
-button.pulse {
-  animation: fadeInUp 0.6s ease-out, gradientShift 6s ease infinite, pulse 2s ease-in-out infinite;
+/* ========== FLASH MESSAGES ========== */
+.flash-message {
+  padding: 12px 16px;
+  margin: 10px auto;
+  border-radius: 4px;
+  font-size: 14px;
+  position: relative;
+  width: 90%;
+  max-width: 600px;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  animation: fadeIn 0.5s ease;
 }
-
-
-
-/* ========== ORGANIZATION LIST ========== */
-.organization-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
-}
-
-.organization-item {
-  background: #f9fafb; /* couleur douce */
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  padding: 1rem;
-  text-align: center;
-}
-
-.organization-logo {
-  width: 80px;
-  height: auto;
-  margin-bottom: 0.5rem;
-}
-
-.organization-info h3 {
-  margin: 0.5rem 0;
-  font-size: 1.1rem;
-  color: #111827; /* gris foncé */
-}
-
-.organization-info p {
-  margin: 0;
-  font-size: 0.9rem;
-}
-
-/* ========== EMAIL LINKS ========== */
-.organization-info a {
-  color: #2563eb; /* bleu accent */
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.organization-info a:hover,
-.organization-info a:focus-visible {
-  text-decoration: underline;
-}
-
-/* Supprimer la décoration par défaut des listes */
-.project-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-}
-
-.project-list li {
-  text-decoration: none;
-}
-
-/* Style des cartes projet */
-.project-item {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.project-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-/* Titre du projet */
-.project-item  h2 a {
-  margin-top: 0;
-  color: black;
-  font-size: 1.4rem;
-  text-align: center;
-  justify-content: center;
-  align-items: center;
-  display: flex;
-  text-decoration: none;
-  font-weight: 100;
-}
-.project-item  h2 a:hover {
-  text-decoration: underline;
-}
-
-/* Texte du projet */
-.project-item p {
-  margin: 0.3rem 0;
-  color: #555;
-  font-size: 0.95rem;
-}
-
-.project-item strong {
-  color: #333;
-}
-
-/* Email cliquable avec icône 📧 */
-.project-item-links a {
-  color: #0078d7;
-  text-decoration: none;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  transition: color 0.3s ease;
-}
-
-.project-item-links a:hover {
-  text-decoration: underline;
-  color: #005a9e;
-}
-
-/* Animation subtile sur l’icône 📧 */
-.project-item-links a::before {
-  content: "📧";
-  transition: transform 0.3s ease;
-}
-
-.project-item-links a:hover::before {
-  transform: scale(1.2);
-}
-
-
-/*  ===================== category ================= */
-
-.category-list {
-  list-style: none;
-  padding: 0;
-  margin: 1rem 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.category-list li {
-  background: #f0f4f8;
-  border-radius: 8px;
-  padding: 0.75rem 1.25rem;
-  font-weight: bold;
-  color: #333;
+.flash-message.success { background-color: #4CAF50; }
+.flash-message.error { background-color: #f44336; }
+.flash-message.info { background-color: #2196F3; }
+.flash-message.warning { background-color: #ff9800; }
+.flash-message .close-btn {
+  position: absolute;
+  right: 12px;
+  top: 8px;
   cursor: pointer;
-  transition: transform 0.2s ease, background 0.3s ease;
+  font-weight: bold;
+  font-size: 18px;
 }
 
-/* Hover effect */
-.category-list li:hover {
-  background: #d9e8ff;
-  transform: scale(1.05);
-}
-
-/* Loader animation */
-.loader__element {
-  animation: fadeInUp 0.6s ease forwards;
-  opacity: 0;
-}
-
-@keyframes fadeInUp {
-  from {
-    transform: translateY(15px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-
-
-/* ========== RESPONSIVE GRID BREAKPOINTS ========== */
-@media (min-width: 520px) {
-  header ul {
-    font-size: 0.85rem;
-    gap: var(--space-6);
-    justify-content: flex-start;
-  }
-  .category-list {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (min-width: 640px) {
-  header ul {
-    font-size: 1rem;
-  }
-  .category-list {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 768px) {
-  .category-list {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (min-width: 900px) {
-  header ul {
-    font-size: 1rem;
-    gap: var(--space-8);
-  }
-  .category-list {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* plus large */
-    gap: var(--space-6); /* plus d’espace entre les items */
-    padding: var(--space-4); /* évite que ça touche les bords */
-  }
-  .category-list li:hover {
-    transform: scale(1.03); /* zoom plus doux pour éviter chevauchement */
-  }
-  @keyframes pulse {
-    0%   { transform: scale(1); opacity: 1; }
-    50%  { transform: scale(1.03); opacity: 0.9; } /* réduit le zoom */
-    100% { transform: scale(1); opacity: 1; }
-  }
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

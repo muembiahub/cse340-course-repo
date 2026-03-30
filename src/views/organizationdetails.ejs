@@ -1,17 +1,117 @@
-<%- include('partials/header') %>
-<main>
-    <h1><%= title %></h1>
+<%- include('partials/header', { title: 'Organization Details' }) %>
 
-    <h2><%= organizationDetails.name %></h2>
-    <img src="/images/<%= organizationDetails.logo_filename %>" alt="<%= organizationDetails.name %> logo">
+<main class="container my-5">
+  <h1 class="mb-4"><%= title %></h1>
 
-    <p>Description: <%= organizationDetails.description %></p>
+  <!-- Tabs -->
+  <ul class="nav nav-tabs" id="orgTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true">
+        <i class="fa-solid fa-building me-1"></i> Details
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="projects-tab" data-bs-toggle="tab" data-bs-target="#projects" type="button" role="tab" aria-controls="projects" aria-selected="false">
+        <i class="fa-solid fa-diagram-project me-1"></i> Projects
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="edit-tab" data-bs-toggle="tab" data-bs-target="#edit" type="button" role="tab" aria-controls="edit" aria-selected="false">
+        <i class="fa-solid fa-pen-to-square me-1"></i> Edit Organization
+      </button>
+    </li>
+  </ul>
 
-    <h3>Service Projects</h3>
-    <ul>
-        <% projects.forEach(project => { %>
-            <li><a href="/projectsdetails/<%= project.project_id %>"><%= project.title %></a></li>
-        <% }) %>
-    </ul>
+  <!-- Tab Content -->
+  <div class="tab-content mt-4" id="orgTabsContent">
+    <!-- Details Tab -->
+    <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+      <div class="card shadow-sm">
+        <div class="card-body text-center">
+          <h2 class="card-title mb-3"><%= organizationDetails.name %></h2>
+          <img src="/images/<%= organizationDetails.logo_filename %>" 
+               alt="<%= organizationDetails.name %> logo" 
+               class="img-fluid rounded mb-3" 
+               style="max-height:150px;">
+          <p class="card-text">
+            <strong>Description:</strong> <%= organizationDetails.description %>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Projects Tab -->
+    <div class="tab-pane fade" id="projects" role="tabpanel" aria-labelledby="projects-tab">
+      <h3 class="mb-3">Service Projects</h3>
+      <% if (projects && projects.length > 0) { %>
+        <ul class="list-group">
+          <% projects.forEach(project => { %>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <a href="/projectsdetails/<%= project.project_id %>" class="text-decoration-none">
+                <%= project.title %>
+              </a>
+              <span class="badge bg-primary">
+                <i class="fa-solid fa-diagram-project me-1"></i> Project
+              </span>
+            </li>
+          <% }) %>
+        </ul>
+      <% } else { %>
+        <div class="alert alert-info d-flex align-items-center mt-3">
+          <i class="fa-solid fa-circle-info me-2"></i>
+          No projects available for this organization.
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Edit Tab -->
+    <div class="tab-pane fade" id="edit" role="tabpanel" aria-labelledby="edit-tab">
+      <h3 class="mb-3">Edit Organization</h3>
+      <form action="/edit-organizationdetails/<%= organizationDetails.organization_id %>" 
+            method="POST" 
+            class="styled-form needs-validation" novalidate>
+
+        <div class="form-group mb-3">
+          <label for="name" class="form-label">
+            <i class="fa-solid fa-building me-1"></i> Organization Name
+          </label>
+          <input type="text" id="name" name="name" class="form-control" 
+                 value="<%= organizationDetails.name %>" maxlength="150" required>
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="description" class="form-label">
+            <i class="fa-solid fa-align-left me-1"></i> Description
+          </label>
+          <textarea id="description" name="description" class="form-control" 
+                    maxlength="500" rows="4" required><%= organizationDetails.description %></textarea>
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="contactEmail" class="form-label">
+            <i class="fa-solid fa-envelope me-1"></i> Contact Email
+          </label>
+          <input type="email" id="contactEmail" name="contactEmail" class="form-control" 
+                 maxlength="255" required value="<%= organizationDetails.contact_email %>">
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="logoFilename" class="form-label">
+            <i class="fa-solid fa-image me-1"></i> Logo Filename
+          </label>
+          <input type="text" id="logoFilename" name="logoFilename" class="form-control" 
+                 maxlength="255" required value="<%= organizationDetails.logo_filename %>">
+        </div>
+
+        <button type="submit" class="btn btn-success pulse">
+          <i class="fa-solid fa-check me-1"></i> Update Organization
+        </button>
+      </form>
+    </div>
+  </div>
 </main>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 <%- include('partials/footer') %>
