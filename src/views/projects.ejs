@@ -62,11 +62,15 @@
                       <a href="/categorydetails/<%= project.category_ids[i] %>" class="badge bg-primary me-1"><%= cat %></a>
                     <% }) %>
                   </p>
-
+                  <% if (user && user.role_name === 'admin') { %>
                   <p>
                     <a href="/assign-categories/<%= project.project_id %>" class="btn btn-sm btn-outline-primary">Edit Categories</a>
                   </p>
-
+                  <% }  else { %>
+                  <p class="text-muted">
+                    <i class="fa-solid fa-lock me-1"></i> Edit Categories - Admins Only
+                  </p>
+                  <% } %>
                   <p class="mt-auto">
                     <strong>Organization:</strong>
                     <a href="/organizationdetails/<%= project.organization_id %>">
@@ -82,6 +86,7 @@
     </div>
 
     <!-- Add Project -->
+     <% if (user && user.role_name === 'admin') { %>
     <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
       <section class="get-involved mt-4">
         <h2 class="mb-3">Add New Project</h2>
@@ -120,6 +125,14 @@
         </form>
       </section>
     </div>
+    <% } else { %>
+    <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
+      <div class="alert alert-info d-flex align-items-center mt-4">
+        <i class="fa-solid fa-circle-info me-2"></i>
+        Only administrators can add new projects. Please log in with an admin account to access this feature.
+      </div>
+  </div>
+  <% } %>
   </div>
 </main>
 

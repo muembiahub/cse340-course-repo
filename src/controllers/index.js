@@ -3,7 +3,11 @@
 // Define any controller functions
 const showHomePage = async (req, res) => {
     const title = 'Home';
-    res.render('home', { title });
+    res.render('home', { 
+        title,
+        role: res.locals.user ? res.locals.user.role_name : null
+
+     });
 };
 
 // Export any controller functions

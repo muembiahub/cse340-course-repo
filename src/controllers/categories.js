@@ -12,7 +12,10 @@ const showCategoriesPage = async (req, res) => {
     const categories = await getAllCategories();
     const title = 'Service Categories';
 
-    res.render('categories', { title, categories });
+    res.render('categories', { 
+      title,
+      role: res.locals.user ? res.locals.user.role_name : null,
+      categories });
 }; 
 const showCategoryDetails = async (req, res) => {
   const categoryId = req.params.id;

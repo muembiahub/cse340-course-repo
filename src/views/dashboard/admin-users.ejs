@@ -1,0 +1,98 @@
+<%- include('../partials/header') %>
+
+<main class="container mt-5">
+  <div class="row">
+    <div class="col-12">
+
+      <!-- Page Title -->
+      <h1 class="mb-4 text-center">
+        <i class="fa-solid fa-users-gear me-2 text-primary"></i>
+        <%= title %>
+      </h1>
+
+      <div class="card shadow-sm">
+        <div class="card-body">
+
+          <% if (users && users.length > 0) { %>
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover align-middle">
+                <thead class="table-dark">
+                  <tr>
+                    <th>#</th>
+                    <th>
+                      <i class="fa-solid fa-user me-1"></i>
+                      Name
+                    </th>
+                    <th>
+                      <i class="fa-solid fa-envelope me-1"></i>
+                      Email
+                    </th>
+                    <th>
+                      <i class="fa-solid fa-id-badge me-1"></i>
+                      Role
+                    </th>
+                    <th class="text-center">
+                      <i class="fa-solid fa-gear me-1"></i>
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% users.forEach((user, index) => { %>
+                    <tr>
+                      <td><%= index + 1 %></td>
+                      <td><%= user.name %></td>
+<td>
+  <span
+    class="email-copy text-primary"
+    role="button"
+    data-bs-toggle="tooltip"
+    data-bs-placement="top"
+    title="Click to copy email"
+    onclick="copyEmail('<%= user.email %>', this)"
+  >
+    <i class="fa-solid fa-envelope me-1"></i>
+    <%= user.email %>
+  </span>
+</td>                      <td>
+                        <span class="badge <%= user.role_name === 'admin' ? 'bg-danger' : 'bg-secondary' %>">
+                          <%= user.role_name %>
+                        </span>
+                      </td>
+                      <td class="text-center">
+                        <a href="/admin/users/<%= user.user_id %>" class="btn btn-sm btn-outline-primary">
+                          <i class="fa-solid fa-eye"></i>
+                        </a>
+
+                        <a href="/admin/users/<%= user.user_id %>/edit" class="btn btn-sm btn-outline-success">
+                          <i class="fa-solid fa-pen-to-square"></i>
+                        </a>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <div class="alert alert-warning text-center">
+              <i class="fa-solid fa-triangle-exclamation me-1"></i>
+              No users found.
+            </div>
+          <% } %>
+
+        </div>
+      </div>
+
+      <!-- Back -->
+      <div class="mt-4 text-end">
+        <a href="/dashboard" class="btn btn-outline-secondary">
+          <i class="fa-solid fa-arrow-left me-1"></i>
+          Back to Dashboard
+        </a>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

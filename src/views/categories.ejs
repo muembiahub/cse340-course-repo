@@ -28,9 +28,16 @@
     </div>
 
     <!-- Bouton Add New Category -->
+     <% if (user && user.role_name === 'admin') { %>
     <a href="/new-category" class="btn btn-success mt-4 d-inline-flex align-items-center">
       <i class="fa-solid fa-plus me-1"></i> Add New Category
     </a>
+    <% } else { %>
+      <!-- Non-admin users see a disabled button -->
+    <button class="btn btn-secondary mt-4 d-inline-flex align-items-center" disabled>
+      <i class="fa-solid fa-lock me-1"></i> Add New Category - Admins Only
+    </button>
+    <% } %>
   </div>
 </main>
 <%- include('partials/footer') %>

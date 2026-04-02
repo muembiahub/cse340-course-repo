@@ -14,7 +14,8 @@ const showOrganizationsPage = async (req, res) => {
     const title = 'Our Partner Organizations';
     const AddOrgBtn = 'Add Organization'
 
-    res.render('organizations', { title, organizations, AddOrgBtn});
+    res.render('organizations', {
+         title, organizations, AddOrgBtn});
 };
 const showOrganizationDetailsPage = async (req, res) => {
     const organizationId = req.params.id;

@@ -1,0 +1,87 @@
+<%- include('../partials/header') %>
+
+<main class="container mt-5">
+  <div class="row justify-content-center">
+
+    <div class="col-md-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+          <!-- Page Title -->
+          <h1 class="text-center mb-4">
+            <i class="fa-solid fa-gauge-high me-2 text-primary"></i>
+            <%= title %>
+          </h1>
+
+          <!-- Welcome Message -->
+          <div class="alert alert-info d-flex align-items-center mb-4">
+            <i class="fa-solid fa-handshake me-2"></i>
+            <span>
+              Welcome back,
+              <strong><%= name %></strong>
+            </span>
+          </div>
+
+          <!-- Account Overview -->
+          <h2 class="h5 mb-3 text-secondary">
+            <i class="fa-solid fa-chart-line me-2"></i>
+            Account Overview
+          </h2>
+
+          <!-- User Info -->
+          <ul class="list-group list-group-flush mb-3">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <i class="fa-solid fa-user text-secondary me-2"></i>
+                <strong>Name</strong>
+              </div>
+              <span><%= name %></span>
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <i class="fa-solid fa-id-badge text-secondary me-2"></i>
+                <strong>Role</strong>
+              </div>
+              <span class="badge <%= role === 'admin' ? 'bg-danger' : 'bg-secondary' %>">
+                <%= role %>
+              </span>
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <i class="fa-solid fa-envelope text-secondary me-2"></i>
+                <strong>Username</strong>
+              </div>
+              <span><%= email %></span>
+            </li>
+          </ul>
+
+          <!-- Actions -->
+          <div class="d-flex justify-content-end gap-2 mt-4">
+            <a href="/admin-dashboard" class="btn btn-outline-primary">
+              <i class="fa-solid fa-pen-to-square me-1"></i>
+              Profile
+            </a>
+
+            <% if (role === 'admin') { %>
+              <a href="/admin-dashboard" class="btn btn-outline-danger">
+                <i class="fa-solid fa-shield-halved me-1"></i>
+                Admin Dashboard
+              </a>
+            <% } %>
+
+            <a href="/logout" class="btn btn-outline-secondary">
+              <i class="fa-solid fa-right-from-bracket me-1"></i>
+              Logout
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

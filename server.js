@@ -44,10 +44,18 @@ app.set('views', path.join(__dirname, 'src/views'));
 
 // Middleware to log all incoming requests
 app.use((req, res, next) => {
-    if (NODE_ENV === 'development') {
-        console.log(`${req.method} ${req.url}`);
-    }
-    next(); // Pass control to the next middleware or route
+  res.locals.isLoggedIn = false;
+  res.locals.user = null;
+  res.locals.role = null;
+
+  if (req.session && req.session.user) {
+    res.locals.isLoggedIn = true;
+    res.locals.user = req.session.user;
+    res.locals.role = req.session.user.role_name;
+  }
+
+  res.locals.NODE_ENV = process.env.NODE_ENV;
+  next();
 });
 
 // Middleware to make NODE_ENV available to all templates
