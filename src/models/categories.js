@@ -23,6 +23,7 @@ const getProjectsByCategory = async (categoryId) => {
       ser.title AS project_title,
       ser.description,
       ser.location,
+      ser.organization_id,
       ser.project_date,
       org.name AS organization_name,
       org.contact_email
@@ -110,7 +111,7 @@ const getCategoryById = async (categoryId) => {
   return result.rows[0];
 };
 
-//  export function ================================
+//  =================== export function ================================
 //   This function will be used to get all the categories from the database and return them as an array of objects. It executes a SELECT query to retrieve all the records from the categories table and returns the result as an array of objects.
 export { getAllCategories, getProjectsByCategory,
    getAllCategoriesWithProjects,updateCategoryAssignments, createCategory, updateCategory, getCategoryById};

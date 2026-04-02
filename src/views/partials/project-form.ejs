@@ -1,0 +1,182 @@
+<% const p = project || {}; %>
+
+<form
+  action="<%= mode === 'edit'
+    ? `/edit-project/${p.project_id}`
+    : '/new-project' %>"
+  method="POST"
+  class="needs-validation bg-light p-4 rounded shadow-sm"
+  novalidate
+>
+
+  <!-- Header -->
+  <div class="mb-4 border-bottom pb-2">
+    <h4 class="mb-0">
+      <i class="fa-solid fa-clipboard-list me-2 text-primary"></i>
+      Project Information
+    </h4>
+    <small class="text-muted">
+      Please complete all required fields
+    </small>
+  </div>
+
+  <!-- Title -->
+  <div class="mb-3">
+    <label class="form-label fw-semibold">
+      <i class="fa-solid fa-heading me-1 text-secondary"></i> Title
+    </label>
+    <div class="input-group">
+      <span class="input-group-text">
+        <i class="fa-solid fa-heading"></i>
+      </span>
+      <input
+        type="text"
+        name="title"
+        class="form-control"
+        required
+        minlength="3"
+        maxlength="150"
+        placeholder="Enter project title"
+        value="<%= p.project_title || '' %>"
+      >
+      <div class="invalid-feedback">
+        Title is required (3–150 characters).
+      </div>
+    </div>
+  </div>
+
+  <!-- Description -->
+  <div class="mb-3">
+    <label class="form-label fw-semibold">
+      <i class="fa-solid fa-align-left me-1 text-secondary"></i> Description
+    </label>
+    <textarea
+      name="description"
+      class="form-control"
+      rows="4"
+      required
+      minlength="10"
+      maxlength="1000"
+      placeholder="Describe the project goals and activities"
+    ><%= p.description || '' %></textarea>
+    <div class="invalid-feedback">
+      Description is required (10–1000 characters).
+    </div>
+  </div>
+
+  <!-- Location & Date -->
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label class="form-label fw-semibold">
+        <i class="fa-solid fa-location-dot me-1 text-secondary"></i> Location
+      </label>
+      <div class="input-group">
+        <span class="input-group-text">
+          <i class="fa-solid fa-location-dot"></i>
+        </span>
+        <input
+          type="text"
+          name="location"
+          class="form-control"
+          required
+          maxlength="200"
+          placeholder="City / Area"
+          value="<%= p.location || '' %>"
+        >
+        <div class="invalid-feedback">
+          Location is required.
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <label class="form-label fw-semibold">
+        <i class="fa-solid fa-calendar-days me-1 text-secondary"></i> Date
+      </label>
+      <input
+        type="date"
+        name="date"
+        class="form-control"
+        required
+        value="<%= p.project_date
+          ? p.project_date.toISOString().split('T')[0]
+          : '' %>"
+      >
+      <div class="invalid-feedback">
+        Please select a valid project date.
+      </div>
+    </div>
+  </div>
+
+  <!-- Organization -->
+ <div class="mb-4">
+  <label class="form-label fw-semibold">
+    <i class="fa-solid fa-building me-1 text-secondary"></i> Organization
+  </label>
+
+  <select
+    name="organizationId"
+    class="form-select selectpicker"
+    data-live-search="true"
+    data-size="6"
+    data-none-selected-text="Select organization"
+    data-style="btn-outline-secondary"
+    required
+  >
+    <option value="">Select organization</option>
+    <% organizations.forEach(org => { %>
+      <option
+        value="<%= org.organization_id %>"
+        <%= p.organization_id === org.organization_id ? 'selected' : '' %>
+      >
+        <%= org.name %>
+      </option>
+    <% }) %>
+  </select>
+
+  <div class="invalid-feedback">
+    Please select an organization.
+  </div>
+</div>
+
+  <!-- Categories (Edit Only) -->
+  <% if (mode === 'edit') { %>
+    <div class="mb-4">
+      <label class="form-label fw-semibold">
+        <i class="fa-solid fa-tags me-1 text-secondary"></i> Categories
+      </label>
+      <select name="categories" class="form-select" multiple required>
+        <% categories.forEach(cat => { %>
+          <option
+            value="<%= cat.category_id %>"
+            <%= p.category_ids?.includes(cat.category_id) ? 'selected' : '' %>
+          >
+            <%= cat.category_name %>
+          </option>
+        <% }) %>
+      </select>
+      <div class="invalid-feedback">
+        Please select at least one category.
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Buttons -->
+  <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+    <button type="submit" class="btn btn-success px-4">
+      <i class="fa-solid fa-floppy-disk me-1"></i>
+      <%= mode === 'edit' ? 'Update Project' : 'Create Project' %>
+    </button>
+
+    <a
+      href="<%= mode === 'edit'
+        ? `/projectsdetails/${p.project_id}`
+        : '/projects' %>"
+      class="btn btn-outline-secondary"
+    >
+      <i class="fa-solid fa-xmark me-1"></i>
+      Cancel
+    </a>
+  </div>
+
+</form>

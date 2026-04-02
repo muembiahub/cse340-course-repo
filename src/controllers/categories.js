@@ -7,6 +7,7 @@ import { getAllCategories,
       createCategory, updateCategory, getCategoryById} from '../models/categories.js';
 import{getProjectsDetails} from '../models/projects.js'
 
+
 // Define  controller functions
 const showCategoriesPage = async (req, res) => {
     const categories = await getAllCategories();
@@ -35,6 +36,7 @@ const showCategoryDetails = async (req, res) => {
   res.render('categorydetails', {
      title,
       category,
+        organizations,
        projects,
         messages: {
       success: req.flash('success'),

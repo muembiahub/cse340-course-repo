@@ -1,74 +1,102 @@
-<%- include('partials/header', { title: 'Project Details' }) %>
+<%- include('partials/header', { title: title }) %>
 
 <main class="container my-5">
-  <h1 class="mb-4"><%= title %></h1>
+
+  <!-- Page Header -->
+  <div class="mb-4">
+    <h1 class="mb-1">
+      <i class="fa-solid fa-diagram-project me-2 text-primary"></i>
+      <%= title %>
+    </h1>
+    <p class="text-muted mb-0">
+      Detailed information about this community service project
+    </p>
+  </div>
 
   <!-- Tabs -->
   <ul class="nav nav-tabs" id="projectTabs" role="tablist">
+
     <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true">
-        <i class="fa-solid fa-info-circle me-1"></i> Details
+      <button class="nav-link active" id="details-tab"
+        data-bs-toggle="tab" data-bs-target="#details"
+        type="button" role="tab">
+        <i class="fa-solid fa-circle-info me-1"></i> Details
       </button>
     </li>
+
     <li class="nav-item" role="presentation">
-      <button class="nav-link" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categories" type="button" role="tab" aria-controls="categories" aria-selected="false">
+      <button class="nav-link" id="categories-tab"
+        data-bs-toggle="tab" data-bs-target="#categories"
+        type="button" role="tab">
         <i class="fa-solid fa-tags me-1"></i> Categories
       </button>
     </li>
-    <% if (user && user.role_name === 'admin') { %>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="edit-tab" data-bs-toggle="tab" data-bs-target="#edit" type="button" role="tab" aria-controls="edit" aria-selected="false">
-        <i class="fa-solid fa-pen-to-square me-1"></i> Edit Project
-      </button>
-    </li>
-    <% }  else { %>
-    <!-- Non-admin users see a disabled Edit tab -->
-    <li class="nav-item" role="presentation">
-      <button class="nav-link disabled" id="edit-tab" type="button" aria-disabled="true">
-        <i class="fa-solid fa-pen-to-square me-1"></i> Edit Project- Admins Only
-      </button>
-    </li>
-    <% } %>
-  </ul>
 
-  <!-- Tab Content -->
-  <div class="tab-content mt-4" id="projectTabsContent">
-    <!-- Details Tab -->
+    <li class="nav-item" role="presentation">
+      <% if (user && user.role_name === 'admin') { %>
+        <button class="nav-link" id="edit-tab"
+          data-bs-toggle="tab" data-bs-target="#edit"
+          type="button" role="tab">
+          <i class="fa-solid fa-pen-to-square me-1"></i> Edit Project
+        </button>
+      <% } else { %>
+        <button class="nav-link disabled" type="button" aria-disabled="true">
+          <i class="fa-solid fa-lock me-1"></i> Edit (Admins Only)
+        </button>
+      <% } %>
+    </li>
 
   </ul>
 
   <!-- Tab Content -->
-  <div class="tab-content mt-4" id="projectTabsContent">
-    <!-- Details Tab -->
-    <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+  <div class="tab-content mt-4">
+
+    <!-- Details -->
+    <div class="tab-pane fade show active" id="details" role="tabpanel">
       <div class="card shadow-sm">
         <div class="card-body">
-          <h2 class="card-title mb-3"><%= project.project_title %></h2>
-          <p class="card-text"><strong>Description:</strong> <%= project.description %></p>
-          <p class="card-text"><strong>Location:</strong> <%= project.location %></p>
-          <p class="card-text"><strong>Date:</strong>
-            <%= new Date(project.project_date).toLocaleDateString('en-US', { 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                }) %>
+
+          <h3 class="card-title mb-3">
+            <i class="fa-solid fa-heading me-1 text-secondary"></i>
+            <%= project.project_title %>
+          </h3>
+
+          <p><strong>Description:</strong> <%= project.description %></p>
+          <p><strong>Location:</strong> <%= project.location %></p>
+          <p><strong>Date:</strong>
+            <%= new Date(project.project_date).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            }) %>
           </p>
-          <p class="card-text">
+
+          <p>
             <strong>Organization:</strong>
-            <a href="/organizationdetails/<%= project.organization_id %>">
+            <a href="/organizationdetails/<%= project.organization_id %>"
+               class="link-primary fw-semibold">
+              <i class="fa-solid fa-building me-1"></i>
               <%= project.organization_name %>
             </a>
           </p>
+
         </div>
       </div>
     </div>
 
-    <!-- Categories Tab -->
-    <div class="tab-pane fade" id="categories" role="tabpanel" aria-labelledby="categories-tab">
-      <h3 class="mb-3">Categories</h3>
-      <% if (project.category_names && project.category_names.length) { %>
+    <!-- Categories -->
+    <div class="tab-pane fade" id="categories" role="tabpanel">
+      <h4 class="mb-3">
+        <i class="fa-solid fa-tags me-1 text-secondary"></i>
+        Categories
+      </h4>
+
+      <% if (project.category_names?.length) { %>
         <% project.category_names.forEach((cat, i) => { %>
-          <a href="/categorydetails/<%= project.category_ids[i] %>" class="badge bg-primary me-1"><%= cat %></a>
+          <a href="/categorydetails/<%= project.category_ids[i] %>"
+             class="badge bg-primary me-1 mb-1">
+            <%= cat %>
+          </a>
         <% }) %>
       <% } else { %>
         <div class="alert alert-info d-flex align-items-center mt-3">
@@ -78,55 +106,39 @@
       <% } %>
     </div>
 
-    <!-- Edit Tab -->
-     <% if (user && user.role_name === 'admin') { %>
-    <div class="tab-pane fade" id="edit" role="tabpanel" aria-labelledby="edit-tab">
-      <h3 class="mb-3">Edit Project</h3>
-      <form action="/edit-project/<%= project.project_id %>" method="POST" class="styled-form needs-validation" novalidate>
-        <div class="form-group mb-3">
-          <label for="projectTitle" class="form-label">
-            <i class="fa-solid fa-heading me-1"></i> Project Title
-          </label>
-          <input type="text" id="projectTitle" name="projectTitle" class="form-control" value="<%= project.project_title %>" maxlength="150" required>
+    <!-- Edit -->
+    <div class="tab-pane fade" id="edit" role="tabpanel">
+      <% if (user && user.role_name === 'admin') { %>
+
+        <div class="card shadow-sm">
+          <div class="card-header bg-warning text-dark">
+            <i class="fa-solid fa-pen-to-square me-1"></i>
+            Edit Project
+          </div>
+          <div class="card-body">
+
+            <%- include('partials/project-form', {
+              mode: 'edit',
+              project,
+              organizations,
+              categories
+            }) %>
+
+          </div>
         </div>
 
-        <div class="form-group mb-3">
-          <label for="description" class="form-label">
-            <i class="fa-solid fa-align-left me-1"></i> Description
-          </label>
-          <textarea id="description" name="description" class="form-control" maxlength="500" rows="4" required><%= project.description %></textarea>
+      <% } else { %>
+
+        <div class="alert alert-info d-flex align-items-center mt-3">
+          <i class="fa-solid fa-lock me-2"></i>
+          You do not have permission to edit this project.
         </div>
 
-        <div class="form-group mb-3">
-          <label for="location" class="form-label">
-            <i class="fa-solid fa-location-dot me-1"></i> Location
-          </label>
-          <input type="text" id="location" name="location" class="form-control" value="<%= project.location %>" maxlength="150" required>
-        </div>
-
-        <div class="form-group mb-3">
-          <label for="projectDate" class="form-label">
-            <i class="fa-solid fa-calendar-day me-1"></i> Date
-          </label>
-          <input type="date" id="projectDate" name="projectDate" class="form-control" value="<%= project.project_date.toISOString().split('T')[0] %>" required>
-        </div>
-
-        <button type="submit" class="btn btn-success pulse">
-          <i class="fa-solid fa-check me-1"></i> Update Project
-        </button>
-      </form>
+      <% } %>
     </div>
-    <% } else { %>
-    <div class="tab-pane fade" id="edit" role="tabpanel" aria-labelledby="edit-tab">
-      <div class="alert alert-info d-flex align-items-center mt-4">
-        <i class="fa-solid fa-circle-info me-2"></i>
-        You do not have permission to edit this project.
-      </div>
-      %> } %>
-  </div>
-</main>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </div>
+
+</main>
 
 <%- include('partials/footer') %>

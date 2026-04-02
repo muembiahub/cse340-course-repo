@@ -11,11 +11,13 @@ import {getProjectsByOrganizationId } from '../models/projects.js';
 // Define any controller functions
 const showOrganizationsPage = async (req, res) => {
     const organizations = await getAllOrganizations();
+    const projects = await getProjectsByOrganizationId();
     const title = 'Our Partner Organizations';
     const AddOrgBtn = 'Add Organization'
 
     res.render('organizations', {
-         title, organizations, AddOrgBtn});
+         title, organizations, AddOrgBtn, projects
+         });
 };
 const showOrganizationDetailsPage = async (req, res) => {
     const organizationId = req.params.id;

@@ -14,20 +14,38 @@ import { updateProject, updateProjectCategories} from '../models/projects.js';
 
 
 
-
-
 // Define any controller functions
 const showProjectsPage = async (req, res) => {
+  try {
     const projects = await getUpcomingProjects(number_of_projects);
-    const title = 'Upcoming Service Projects';
-    const button = 'Add Project'
+    const categories = await getAllCategories(); // ✅ REQUIRED
+    const organizations = await getAllOrganizations(); // ✅ REQUIRED
 
-    res.render('projects', { title, projects , button });
+    const title = 'Upcoming Service Projects';
+    const button = 'Add Project';
+
+    res.render('projects', {
+      title,
+      projects,
+      categories,        // ✅ pass to EJS
+      organizations,     // ✅ pass to EJS
+      button,
+      user: req.session.user // ✅ keep role checks working
+    });
+
+  } catch (error) {
+    console.error('Error loading projects page:', error);
+    res.status(500).render('errors', {
+      message: 'Error loading projects page'
+    });
+  }
 };
 
 const showProjectDetailsPage = async (req, res) => {
   try {
     const project = await getProjectsDetails(req.params.id);
+    const categories = await getAllCategories(); // ✅ REQUIRED
+    const organizations = await getAllOrganizations(); // ✅ REQUIRED
 
     // Comme getProjectsDetails retourne un tableau, on prend la première ligne
     const projectData = project ? project : null;
@@ -37,7 +55,11 @@ const showProjectDetailsPage = async (req, res) => {
       return res.status(404).render('errors', { message: 'Projet introuvable' });
     }
 
-    res.render('projectsdetails', { title, project: projectData});
+    res.render('projectsdetails', { 
+      title, 
+      project: projectData,
+      categories,
+       organizations });
   } catch (err) {
     console.error('Error showing project details:', err);
     res.status(500).render('errors', { message: 'Erreur serveur lors du chargement du projet' });

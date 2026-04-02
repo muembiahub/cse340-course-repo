@@ -1,125 +1,222 @@
-<%- include('partials/header', { title: 'Organization Details' }) %>
+<%- include('partials/header', { title }) %>
 
 <main class="container my-5">
-  <h1 class="mb-4"><%= title %></h1>
+
+  <!-- Page Header -->
+  <div class="mb-4">
+    <h1 class="mb-1">
+      <i class="fa-solid fa-building me-2 text-primary"></i>
+      <%= title %>
+    </h1>
+    <p class="text-muted mb-0">
+      Organization details and associated service projects
+    </p>
+  </div>
 
   <!-- Tabs -->
   <ul class="nav nav-tabs" id="orgTabs" role="tablist">
-    <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true">
-        <i class="fa-solid fa-building me-1"></i> Details
+    <li class="nav-item">
+      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#details" type="button">
+        <i class="fa-solid fa-circle-info me-1"></i> Details
       </button>
     </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="projects-tab" data-bs-toggle="tab" data-bs-target="#projects" type="button" role="tab" aria-controls="projects" aria-selected="false">
+
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#projects" type="button">
         <i class="fa-solid fa-diagram-project me-1"></i> Projects
       </button>
     </li>
-    <% if (user && user.role_name === 'admin') { %>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="edit-tab" data-bs-toggle="tab" data-bs-target="#edit" type="button" role="tab" aria-controls="edit" aria-selected="false">
-        <i class="fa-solid fa-pen-to-square me-1"></i> Edit Organization
-      </button>
+
+    <li class="nav-item">
+      <% if (user && user.role_name === 'admin') { %>
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#edit" type="button">
+          <i class="fa-solid fa-pen-to-square me-1"></i> Edit Organization
+        </button>
+      <% } else { %>
+        <button class="nav-link disabled" type="button">
+          <i class="fa-solid fa-lock me-1"></i> Edit (Admins Only)
+        </button>
+      <% } %>
     </li>
-    <% }  else { %>
-    <!-- Non-admin users see a disabled Edit tab -->
-    <li class="nav-item" role="presentation">
-      <button class="nav-link disabled" id="edit-tab" type="button" aria-disabled="true">
-        <i class="fa-solid fa-pen-to-square me-1"></i> Edit Organization - Admins Only
-      </button>
-    <% } %>
   </ul>
 
   <!-- Tab Content -->
-  <div class="tab-content mt-4" id="orgTabsContent">
-    <!-- Details Tab -->
-    <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+  <div class="tab-content mt-4">
+
+    <!-- DETAILS TAB -->
+    <div class="tab-pane fade show active" id="details">
       <div class="card shadow-sm">
         <div class="card-body text-center">
-          <h2 class="card-title mb-3"><%= organizationDetails.name %></h2>
-          <img src="/images/<%= organizationDetails.logo_filename %>" 
-               alt="<%= organizationDetails.name %> logo" 
-               class="img-fluid rounded mb-3" 
-               style="max-height:150px;">
-          <p class="card-text">
-            <strong>Description:</strong> <%= organizationDetails.description %>
+
+          <h3 class="fw-semibold mb-3"><%= organizationDetails.name %></h3>
+
+          <img
+            src="/images/<%= organizationDetails.logo_filename %>"
+            alt="<%= organizationDetails.name %> logo"
+            class="img-fluid rounded mb-3"
+            style="max-height:150px;"
+          >
+
+          <p>
+            <strong>Description:</strong>
+            <%= organizationDetails.description %>
           </p>
+
+          <p>
+            <strong>Contact:</strong>
+            <a href="mailto:<%= organizationDetails.contact_email %>">
+              <i class="fa-solid fa-envelope me-1"></i>
+              <%= organizationDetails.contact_email %>
+            </a>
+          </p>
+
         </div>
       </div>
     </div>
 
-    <!-- Projects Tab -->
-    <div class="tab-pane fade" id="projects" role="tabpanel" aria-labelledby="projects-tab">
-      <h3 class="mb-3">Service Projects</h3>
+    <!-- PROJECTS TAB -->
+    <div class="tab-pane fade" id="projects">
+
+      <!-- Header / Controls -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">
+          <i class="fa-solid fa-diagram-project me-1 text-primary"></i>
+          Service Projects
+          <span class="badge bg-secondary ms-2" id="projectCount">
+            <%= projects?.length || 0 %>
+          </span>
+        </h4>
+
+        <select id="projectSort" class="form-select form-select-sm w-auto">
+          <option value="title">Sort by Name</option>
+          <option value="date">Sort by Date</option>
+        </select>
+      </div>
+
+      <!-- Search -->
+      <input
+        type="text"
+        id="projectSearch"
+        class="form-control mb-3"
+        placeholder="Search projects..."
+      >
+
       <% if (projects && projects.length > 0) { %>
-        <ul class="list-group">
-          <% projects.forEach(project => { %>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <a href="/projectsdetails/<%= project.project_id %>" class="text-decoration-none">
-                <%= project.title %>
-              </a>
-              <span class="badge bg-primary">
-                <i class="fa-solid fa-diagram-project me-1"></i> Project
-              </span>
-            </li>
+        <div class="row g-3" id="projectList">
+
+          <% projects.forEach(project => { 
+            const titleSafe = project.project_title || project.title || 'Untitled Project';
+          %>
+            <div
+              class="col-md-6 project-item"
+              data-title="<%= titleSafe.toLowerCase() %>"
+              data-date="<%= project.project_date
+                ? new Date(project.project_date).toISOString()
+                : '' %>"
+            >
+              <div class="card h-100 shadow-sm border-0 <%= project.featured ? 'border-warning border-2' : '' %>">
+                <div class="card-body d-flex justify-content-between align-items-start">
+
+                  <div>
+                    <h6 class="mb-1">
+                      <a href="/projectsdetails/<%= project.project_id %>" class="fw-semibold text-decoration-none">
+                        <i class="fa-solid fa-folder-open me-1 text-secondary"></i>
+                        <%= titleSafe %>
+                      </a>
+
+                      <% if (project.featured) { %>
+                        <span class="badge bg-warning text-dark ms-1">⭐ Featured</span>
+                      <% } %>
+                    </h6>
+
+                    <small class="text-muted">
+                      <i class="fa-solid fa-calendar-days me-1"></i>
+                      <%= project.project_date
+                        ? new Date(project.project_date).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          })
+                        : 'No date' %>
+                    </small>
+                  </div>
+
+                  <span class="badge bg-primary rounded-pill">Project</span>
+
+                </div>
+              </div>
+            </div>
           <% }) %>
-        </ul>
+
+        </div>
       <% } else { %>
         <div class="alert alert-info d-flex align-items-center mt-3">
           <i class="fa-solid fa-circle-info me-2"></i>
           No projects available for this organization.
         </div>
       <% } %>
+
     </div>
 
-    <!-- Edit Tab -->
-    <div class="tab-pane fade" id="edit" role="tabpanel" aria-labelledby="edit-tab">
-      <h3 class="mb-3">Edit Organization</h3>
-      <form action="/edit-organizationdetails/<%= organizationDetails.organization_id %>" 
-            method="POST" 
-            class="styled-form needs-validation" novalidate>
-
-        <div class="form-group mb-3">
-          <label for="name" class="form-label">
-            <i class="fa-solid fa-building me-1"></i> Organization Name
-          </label>
-          <input type="text" id="name" name="name" class="form-control" 
-                 value="<%= organizationDetails.name %>" maxlength="150" required>
+    <!-- EDIT TAB -->
+    <div class="tab-pane fade" id="edit">
+      <% if (user && user.role_name === 'admin') { %>
+        <div class="card shadow-sm">
+          <div class="card-header bg-warning text-dark">
+            <i class="fa-solid fa-pen-to-square me-1"></i> Edit Organization
+          </div>
+          <div class="card-body">
+            <%- include('partials/organization-form', {
+              mode: 'edit',
+              organization: organizationDetails
+            }) %>
+          </div>
         </div>
-
-        <div class="form-group mb-3">
-          <label for="description" class="form-label">
-            <i class="fa-solid fa-align-left me-1"></i> Description
-          </label>
-          <textarea id="description" name="description" class="form-control" 
-                    maxlength="500" rows="4" required><%= organizationDetails.description %></textarea>
+      <% } else { %>
+        <div class="alert alert-info d-flex align-items-center mt-3">
+          <i class="fa-solid fa-lock me-2"></i>
+          You do not have permission to edit this organization.
         </div>
-
-        <div class="form-group mb-3">
-          <label for="contactEmail" class="form-label">
-            <i class="fa-solid fa-envelope me-1"></i> Contact Email
-          </label>
-          <input type="email" id="contactEmail" name="contactEmail" class="form-control" 
-                 maxlength="255" required value="<%= organizationDetails.contact_email %>">
-        </div>
-
-        <div class="form-group mb-3">
-          <label for="logoFilename" class="form-label">
-            <i class="fa-solid fa-image me-1"></i> Logo Filename
-          </label>
-          <input type="text" id="logoFilename" name="logoFilename" class="form-control" 
-                 maxlength="255" required value="<%= organizationDetails.logo_filename %>">
-        </div>
-
-        <button type="submit" class="btn btn-success pulse">
-          <i class="fa-solid fa-check me-1"></i> Update Organization
-        </button>
-      </form>
+      <% } %>
     </div>
+
   </div>
 </main>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Search / Sort Script -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const searchInput = document.getElementById('projectSearch');
+  const sortSelect = document.getElementById('projectSort');
+  const projects = Array.from(document.querySelectorAll('.project-item'));
+  const projectList = document.getElementById('projectList');
+  const projectCount = document.getElementById('projectCount');
+
+  function updateCount() {
+    projectCount.textContent = projects.filter(p => p.style.display !== 'none').length;
+  }
+
+  function filterProjects() {
+    const q = searchInput.value.toLowerCase();
+    projects.forEach(p => {
+      p.style.display = p.dataset.title.includes(q) ? '' : 'none';
+    });
+    updateCount();
+  }
+
+  function sortProjects() {
+    const by = sortSelect.value;
+    projects.sort((a, b) =>
+      by === 'title'
+        ? a.dataset.title.localeCompare(b.dataset.title)
+        : new Date(b.dataset.date) - new Date(a.dataset.date)
+    );
+    projects.forEach(p => projectList.appendChild(p));
+  }
+
+  searchInput?.addEventListener('input', filterProjects);
+  sortSelect?.addEventListener('change', sortProjects);
+});
+</script>
 
 <%- include('partials/footer') %>

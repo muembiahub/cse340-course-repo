@@ -86,54 +86,29 @@
     </div>
 
     <!-- Add Project -->
-     <% if (user && user.role_name === 'admin') { %>
-    <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
-      <section class="get-involved mt-4">
-        <h2 class="mb-3">Add New Project</h2>
-        <form action="/new-project" method="POST" class="styled-form needs-validation" novalidate>
-          <div class="form-group mb-3">
-            <label for="projectTitle" class="form-label">
-              <i class="fa-solid fa-heading me-1"></i> Project Title
-            </label>
-            <input type="text" id="projectTitle" name="projectTitle" class="form-control" maxlength="150" required>
-          </div>
+<% if (user && user.role_name === 'admin') { %>
+  <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
+    <section class="get-involved mt-4">
+      <h2 class="mb-3">Add New Project</h2>
 
-          <div class="form-group mb-3">
-            <label for="description" class="form-label">
-              <i class="fa-solid fa-align-left me-1"></i> Description
-            </label>
-            <textarea id="description" name="description" class="form-control" maxlength="500" rows="4" required></textarea>
-          </div>
+      <%- include('partials/project-form', {
+        mode: 'create',
+        project: null,
+        categories,
+        organizations
+      }) %>
 
-          <div class="form-group mb-3">
-            <label for="location" class="form-label">
-              <i class="fa-solid fa-location-dot me-1"></i> Location
-            </label>
-            <input type="text" id="location" name="location" class="form-control" maxlength="150" required>
-          </div>
-
-          <div class="form-group mb-3">
-            <label for="contactEmail" class="form-label">
-              <i class="fa-solid fa-envelope me-1"></i> Contact Email
-            </label>
-            <input type="email" id="contactEmail" name="contactEmail" class="form-control" maxlength="255" required>
-          </div>
-
-          <button type="submit" class="btn btn-success pulse">
-            <i class="fa-solid fa-check me-1"></i> Create Project
-          </button>
-        </form>
-      </section>
+    </section>
+  </div>
+<% } else { %>
+  <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
+    <div class="alert alert-info d-flex align-items-center mt-4">
+      <i class="fa-solid fa-circle-info me-2"></i>
+      Only administrators can add new projects.
     </div>
-    <% } else { %>
-    <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
-      <div class="alert alert-info d-flex align-items-center mt-4">
-        <i class="fa-solid fa-circle-info me-2"></i>
-        Only administrators can add new projects. Please log in with an admin account to access this feature.
-      </div>
   </div>
-  <% } %>
-  </div>
+<% } %>
+</div>
 </main>
 
 <!-- Bootstrap JS -->

@@ -1,43 +1,111 @@
 <%- include('partials/header', { title: 'Categories' }) %>
-<main class="bg-light">
-  <div class="container mt-5">
-    <div class="card shadow-lg">
-      <div class="card-header bg-primary text-white d-flex align-items-center">
-        <i class="fa-solid fa-tags me-2"></i>
-        <h3 class="mb-0"><%= title %></h3>
-      </div>
-      <div class="card-body">
-        <% if (categories && categories.length > 0) { %>
-          <ul class="list-group">
-            <% categories.forEach(category => { %>
-              <li class="list-group-item d-flex align-items-center">
+
+<main class="container my-5">
+
+  <!-- Page Header -->
+  <div class="mb-4">
+    <h2 class="mb-1">
+      <i class="fa-solid fa-tags me-2 text-primary"></i>
+      Categories
+      <span class="badge bg-secondary ms-2">
+        <%= categories?.length || 0 %>
+      </span>
+    </h2>
+    <p class="text-muted mb-0">
+      Browse service categories used to organize community projects
+    </p>
+  </div>
+
+  <!-- Categories Card -->
+  <div class="card shadow-sm">
+    <div class="card-body">
+
+      <% if (categories && categories.length > 0) { %>
+
+        <ul class="list-group list-group-flush">
+          <% categories.forEach(category => { %>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+
+              <!-- Category Name -->
+              <div>
                 <i class="fa-solid fa-tag text-secondary me-2"></i>
-                <a href="/categorydetails/<%= category.category_id %>" class="text-decoration-none">
+                <a
+                  href="/categorydetails/<%= category.category_id %>"
+                  class="text-decoration-none fw-semibold"
+                >
                   <%= category.category_name %>
                 </a>
-              </li>
-            <% }) %>
-          </ul>
-        <% } else { %>
-          <div class="alert alert-info d-flex align-items-center">
-            <i class="fa-solid fa-circle-info me-2"></i>
-            No categories available.
-          </div>
-        <% } %>
-      </div>
-    </div>
+              </div>
 
-    <!-- Bouton Add New Category -->
-     <% if (user && user.role_name === 'admin') { %>
-    <a href="/new-category" class="btn btn-success mt-4 d-inline-flex align-items-center">
-      <i class="fa-solid fa-plus me-1"></i> Add New Category
-    </a>
-    <% } else { %>
-      <!-- Non-admin users see a disabled button -->
-    <button class="btn btn-secondary mt-4 d-inline-flex align-items-center" disabled>
-      <i class="fa-solid fa-lock me-1"></i> Add New Category - Admins Only
-    </button>
-    <% } %>
+            </li>
+          <% }) %>
+        </ul>
+
+      <% } else { %>
+
+        <div class="alert alert-info d-flex align-items-center">
+          <i class="fa-solid fa-circle-info me-2"></i>
+          No categories available.
+        </div>
+
+      <% } %>
+
+    </div>
   </div>
+
 </main>
+
+<!-- Floating Action Button (Add Category) -->
+<% if (user && user.role_name === 'admin') { %>
+<button
+  type="button"
+  class="btn btn-success d-flex align-items-center justify-content-center position-fixed"
+  style="
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 9999;
+  "
+  data-bs-toggle="modal"
+  data-bs-target="#addCategoryModal"
+  aria-label="Add New Category"
+  title="Add New Category"
+>
+  <i class="fa-solid fa-plus"></i>
+</button>
+<% } %>
+
+<!-- Add Category Modal -->
+<div
+  class="modal fade"
+  id="addCategoryModal"
+  tabindex="-1"
+  aria-labelledby="addCategoryModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-md modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="addCategoryModalLabel">
+          <i class="fa-solid fa-tag me-1"></i>
+          Add New Category
+        </h5>
+        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <%- include('partials/category-form', {
+          mode: 'create',
+          category: null
+        }) %>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <%- include('partials/footer') %>

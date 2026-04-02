@@ -5,12 +5,13 @@ const getProjectsByOrganizationId = async (organizationId) => {
         SELECT
           project_id,
           organization_id,
-          title,
+          title as project_title,
+          project_date,
           description,
           location
         FROM service_projects
         WHERE organization_id = $1
-        order by title;
+        order by project_title;
       `;
       
       const query_params = [organizationId];

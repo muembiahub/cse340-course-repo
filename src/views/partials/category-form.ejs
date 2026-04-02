@@ -1,0 +1,55 @@
+<% const c = category || {}; %>
+
+<form
+  action="<%= mode === 'edit'
+    ? `/edit-category/${c.category_id}`
+    : '/new-category' %>"
+  method="POST"
+  class="needs-validation bg-light p-4 rounded shadow-sm"
+  novalidate
+>
+
+  <!-- Header -->
+  <div class="mb-4 border-bottom pb-2">
+    <h4 class="mb-0">
+      <i class="fa-solid fa-tag me-2 text-primary"></i>
+      <%= mode === 'edit' ? 'Edit Category' : 'Add New Category' %>
+    </h4>
+    <small class="text-muted">
+      Category names should be short and descriptive
+    </small>
+  </div>
+
+  <!-- Category Name -->
+  <div class="mb-3">
+    <label class="form-label fw-semibold">
+      <i class="fa-solid fa-tag me-1 text-secondary"></i>
+      Category Name
+    </label>
+    <input
+      type="text"
+      name="category_name"
+      class="form-control"
+      required
+      minlength="3"
+      maxlength="150"
+      placeholder="e.g. Environmental Cleanup"
+      value="<%= c.category_name || '' %>"
+    >
+    <div class="invalid-feedback">
+      Category name is required (3–150 characters).
+    </div>
+  </div>
+
+  <!-- Buttons -->
+  <div class="d-flex justify-content-between pt-3 border-top">
+    <button type="submit" class="btn btn-success px-4">
+      <i class="fa-solid fa-check me-1"></i>
+      <%= mode === 'edit' ? 'Update Category' : 'Save Category' %>
+    </button>
+
+    <a href="/categories" class="btn btn-secondary">
+      <i class="fa-solid fa-xmark me-1"></i> Cancel
+    </a>
+  </div>
+</form>

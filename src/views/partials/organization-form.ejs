@@ -1,0 +1,110 @@
+<% const o = organization || {}; %>
+
+<form
+  action="<%= mode === 'edit'
+    ? `/edit-organizationdetails/${o.organization_id}`
+    : '/new-organization' %>"
+  method="POST"
+  class="needs-validation bg-light p-4 rounded shadow-sm"
+  novalidate
+>
+
+  <!-- Header -->
+  <div class="mb-4 border-bottom pb-2">
+    <h4 class="mb-0">
+      <i class="fa-solid fa-building me-2 text-primary"></i>
+      <%= mode === 'edit' ? 'Edit Organization' : 'Add New Organization' %>
+    </h4>
+    <small class="text-muted">All required fields must be completed</small>
+  </div>
+
+  <!-- Organization Name -->
+  <div class="mb-3">
+    <label class="form-label fw-semibold">
+      <i class="fa-solid fa-building me-1 text-secondary"></i> Organization Name
+    </label>
+    <input
+      type="text"
+      name="name"
+      class="form-control"
+      required
+      minlength="3"
+      maxlength="150"
+      placeholder="Enter organization name"
+      value="<%= o.name || '' %>"
+    >
+    <div class="invalid-feedback">
+      Organization name is required (3–150 characters).
+    </div>
+  </div>
+
+  <!-- Description -->
+  <div class="mb-3">
+    <label class="form-label fw-semibold">
+      <i class="fa-solid fa-align-left me-1 text-secondary"></i> Description
+    </label>
+    <textarea
+      name="description"
+      class="form-control"
+      rows="4"
+      maxlength="500"
+      required
+      placeholder="Describe the organization"
+    ><%= o.description || '' %></textarea>
+    <div class="invalid-feedback">
+      Please provide a description (max 500 characters).
+    </div>
+  </div>
+
+  <!-- Contact Email -->
+  <div class="mb-3">
+    <label class="form-label fw-semibold">
+      <i class="fa-solid fa-envelope me-1 text-secondary"></i> Contact Email
+    </label>
+    <input
+      type="email"
+      name="contactEmail"
+      class="form-control"
+      required
+      maxlength="255"
+      placeholder="contact@example.org"
+      value="<%= o.contact_email || '' %>"
+    >
+    <div class="invalid-feedback">
+      Please enter a valid email address.
+    </div>
+  </div>
+
+  <!-- Logo Filename (edit only optional) -->
+  <div class="mb-3">
+    <label class="form-label fw-semibold">
+      <i class="fa-solid fa-image me-1 text-secondary"></i> Logo Filename
+    </label>
+    <input
+      type="text"
+      name="logoFilename"
+      class="form-control"
+      maxlength="255"
+      placeholder="logo.png"
+      value="<%= o.logo_filename || '' %>"
+    >
+  </div>
+
+  <!-- Buttons -->
+  <div class="d-flex justify-content-between pt-3 border-top">
+    <button type="submit" class="btn btn-success px-4">
+      <i class="fa-solid fa-check me-1"></i>
+      <%= mode === 'edit' ? 'Update Organization' : 'Create Organization' %>
+    </button>
+
+    <a
+      href="<%= mode === 'edit'
+        ? `/organizationdetails/${o.organization_id}`
+        : '/organizationslist' %>"
+      class="btn btn-secondary"
+    >
+      <i class="fa-solid fa-xmark me-1"></i> Cancel
+    </a>
+  </div>
+
+</form>
