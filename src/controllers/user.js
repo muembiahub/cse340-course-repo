@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 
-import { createUser,authenticateUser, getAllUsers} from '../models/user.js';
+import { createUser,authenticateUser, getAllUsers,findUserById ,getAllRoles, updateUserRole } from '../models/user.js';
 
 const showUserRegistrationForm = (req, res) => {
     res.render('register', { title: 'Register' });
@@ -137,9 +137,41 @@ const showAdminUsersPage = async (req, res) => {
 };
 
 
+// Show Admin User Role Update Page
+const showAdminUserRoleUpdatePage = async (req, res) => {
+    const user = req.session.user;
+    const userId = req.params.id;
+    const userToEdit = await findUserById(userId);
+    const roles = await getAllRoles();
+    res.render('dashboard/admin-user-role-update', {
+        title: 'Update User Role',
+        name: user.name || 'No name provided',
+        role: user.role_name || 'User',
+        email: user.email || 'No email provided',
+        userToEdit,
+        roles
+    });
+}
+const processAdminUserRoleUpdatePage = async (req, res) => {
+    const userId = req.params.id;
+    const { roleId } = req.body;
+    try {
+        
+        await updateUserRole(userId, roleId);
+        req.flash('success', 'User role updated successfully!');
+        res.redirect('/admin/users');
+    } catch (error) {
+        console.error('Error updating user role:', error);
+        req.flash('error', 'An error occurred while updating the user role.');
+        res.redirect('/admin/users');
+
+    }
+}
+
 
 export { showUserRegistrationForm,
      processUserRegistrationForm, 
      showLoginForm, 
      processLoginForm,
-      processLogout,requireRole, showDashboard, showAdminDashboard , showAdminUsersPage};
+      processLogout,requireRole, showDashboard, showAdminDashboard ,
+       showAdminUsersPage, showAdminUserRoleUpdatePage, processAdminUserRoleUpdatePage};

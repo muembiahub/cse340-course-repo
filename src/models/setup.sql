@@ -28,7 +28,7 @@ CREATE TABLE service_projects
  description TEXT, 
  location VARCHAR(150), 
  project_date DATE,
- FOREIGN KEY (organization_id) REFERENCES organizations(organization_id) );
+ FOREIGN KEY (organization_id) REFERENCES organization(organization_id) );
 
 
 --  ==========================  insert data into      ===============================

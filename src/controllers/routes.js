@@ -39,7 +39,7 @@ import { showUserRegistrationForm,
      processUserRegistrationForm, 
      showLoginForm, 
      processLoginForm,
-      processLogout,requireRole,showDashboard, showAdminDashboard,showAdminUsersPage} from './user.js';
+      processLogout,requireRole,showDashboard, showAdminDashboard,showAdminUsersPage, showAdminUserRoleUpdatePage, processAdminUserRoleUpdatePage} from './user.js';
 import { requireLogin } from '../models/user.js';
 
 import { testErrorPage } from './errors.js';
@@ -91,6 +91,8 @@ router.get('/logout', processLogout);
 router.get('/dashboard', requireLogin, showDashboard);
 router.get('/admin-dashboard', requireLogin, showAdminDashboard);
 router.get('/admin/users', requireRole('admin'), showAdminUsersPage);
+router.get('/admin/users/:id/updateRole', requireRole('admin'), showAdminUserRoleUpdatePage);
+router.post('/admin/users/:id/updateRole', requireRole('admin'), processAdminUserRoleUpdatePage);
 
 // error-handling routes
 router.get('/test-error', testErrorPage);

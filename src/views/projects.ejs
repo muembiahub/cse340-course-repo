@@ -1,79 +1,92 @@
 <%- include('partials/header', { title: 'Community Service Projects' }) %>
 
 <main class="container my-5">
-  <h1 class="mb-3"><%= title %></h1>
-  <p class="subtitle text-muted">Discover our latest community service projects and how you can contribute.</p>
+
+  <!-- Hero Section -->
+  <section class="text-center mb-5">
+    <h1 class="fw-bold text-primary"><i class="fa-solid fa-hand-holding-heart me-2"></i><%= title %></h1>
+    <p class="lead text-muted">Discover our latest community service projects and how you can contribute.</p>
+    <hr class="w-25 mx-auto border-primary">
+  </section>
 
   <!-- Tabs -->
-  <ul class="nav nav-tabs" id="projectTabs" role="tablist">
+  <ul class="nav nav-tabs justify-content-center" id="projectTabs" role="tablist">
     <li class="nav-item" role="presentation">
       <button class="nav-link active" id="list-tab" data-bs-toggle="tab" data-bs-target="#list" type="button" role="tab" aria-controls="list" aria-selected="true">
         <i class="fa-solid fa-list me-1"></i> Projects List
       </button>
     </li>
+     <% if (user && user.role_name === 'admin') { %>
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="add-tab" data-bs-toggle="tab" data-bs-target="#add" type="button" role="tab" aria-controls="add" aria-selected="false">
         <i class="fa-solid fa-plus me-1"></i> Add Project
       </button>
     </li>
+    <% } else { %>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link disabled" type="button">
+        <i class="fa-solid fa-lock me-1"></i> Add Project (Admins Only)
+      </button>
+    </li>
+    <% } %>
   </ul>
 
   <!-- Tab Content -->
   <div class="tab-content mt-4" id="projectTabsContent">
+
     <!-- Projects List -->
     <div class="tab-pane fade show active" id="list" role="tabpanel" aria-labelledby="list-tab">
       <section class="projects mt-4">
         <div class="row g-4">
           <% projects.forEach(project => { %>
             <div class="col-md-6 col-lg-4">
-              <div class="card h-100 shadow-sm project-item">
+              <div class="card h-100 shadow-sm border-0 project-item hover-shadow">
+                <% if (project.logo_filename) { %>
+                  <img src="<%= project.logo_filename %>" alt="<%= project.organization_name %> Logo" class="card-img-top img-fluid p-3" style="max-height:120px; object-fit:contain;">
+                <% } %>
                 <div class="card-body d-flex flex-column">
-                  <h5 class="card-title">
-                    <a href="/projectsdetails/<%= project.project_id %>">
-                      <%= project.project_title %>
+                  <h5 class="card-title fw-bold text-primary">
+                    <a href="/projectsdetails/<%= project.project_id %>" class="text-decoration-none">
+                      <i class="fa-solid fa-seedling me-1"></i> <%= project.project_title %>
                     </a>
                   </h5>
-                  <p class="card-text"><strong>Description:</strong> <%= project.description %></p>
-                  <p class="card-text"><strong>Location:</strong> <%= project.location %></p>
-                  <p class="card-text"><strong>Date:</strong>
+                  <p class="card-text"><i class="fa-solid fa-align-left me-1 text-secondary"></i><strong>Description:</strong> <%= project.description %></p>
+                  <p class="card-text"><i class="fa-solid fa-location-dot me-1 text-danger"></i><strong>Location:</strong> <%= project.location %></p>
+                  <p class="card-text"><i class="fa-solid fa-calendar-days me-1 text-success"></i><strong>Date:</strong>
                     <%= new Date(project.project_date).toLocaleDateString('en-US', { 
                           year: 'numeric', 
                           month: 'long', 
                           day: 'numeric' 
                         }) %>
                   </p>
-
-                  <p class="card-text">
-                    <strong>Contact:</strong>
-                    <a href="mailto:<%= project.contact_email %>?subject=Interested in <%= project.project_title %>">
+                  <p class="card-text"><i class="fa-solid fa-envelope me-1 text-info"></i><strong>Contact:</strong>
+                    <a href="mailto:<%= project.contact_email %>?subject=Interested in <%= project.project_title %>" class="text-decoration-none">
                       <%= project.contact_email %>
                     </a>
                   </p>
 
-                  <% if (project.logo_filename) { %>
-                    <div class="text-center mb-2">
-                      <img src="<%= project.logo_filename %>" alt="<%= project.organization_name %> Logo" class="img-fluid rounded" style="max-height:100px;">
-                    </div>
-                  <% } %>
-
                   <p class="card-text">
-                    <strong>Categories:</strong>
+                    <i class="fa-solid fa-tags me-1 text-warning"></i><strong>Categories:</strong>
                     <% project.category_names.forEach((cat, i) => { %>
-                      <a href="/categorydetails/<%= project.category_ids[i] %>" class="badge bg-primary me-1"><%= cat %></a>
+                      <a href="/categorydetails/<%= project.category_ids[i] %>" class="badge bg-gradient bg-primary me-1"><%= cat %></a>
                     <% }) %>
                   </p>
+
                   <% if (user && user.role_name === 'admin') { %>
-                  <p>
-                    <a href="/assign-categories/<%= project.project_id %>" class="btn btn-sm btn-outline-primary">Edit Categories</a>
-                  </p>
-                  <% }  else { %>
-                  <p class="text-muted">
-                    <i class="fa-solid fa-lock me-1"></i> Edit Categories - Admins Only
-                  </p>
+                    <p>
+                      <a href="/assign-categories/<%= project.project_id %>" class="btn btn-sm btn-outline-primary">
+                        <i class="fa-solid fa-pen-to-square me-1"></i> Edit Categories
+                      </a>
+                    </p>
+                  <% } else { %>
+                    <p class="text-muted">
+                      <i class="fa-solid fa-lock me-1"></i> Edit Categories - Admins Only
+                    </p>
                   <% } %>
+
                   <p class="mt-auto">
-                    <strong>Organization:</strong>
-                    <a href="/organizationdetails/<%= project.organization_id %>">
+                    <i class="fa-solid fa-building me-1 text-secondary"></i><strong>Organization:</strong>
+                    <a href="/organizationdetails/<%= project.organization_id %>" class="text-decoration-none">
                       <%= project.organization_name %>
                     </a>
                   </p>
@@ -86,29 +99,27 @@
     </div>
 
     <!-- Add Project -->
-<% if (user && user.role_name === 'admin') { %>
-  <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
-    <section class="get-involved mt-4">
-      <h2 class="mb-3">Add New Project</h2>
-
-      <%- include('partials/project-form', {
-        mode: 'create',
-        project: null,
-        categories,
-        organizations
-      }) %>
-
-    </section>
+    <% if (user && user.role_name === 'admin') { %>
+      <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
+        <section class="get-involved mt-4">
+          <h2 class="mb-3 text-success"><i class="fa-solid fa-plus-circle me-2"></i>Add New Project</h2>
+          <%- include('partials/project-form', {
+            mode: 'create',
+            project: null,
+            categories,
+            organizations
+          }) %>
+        </section>
+      </div>
+    <% } else { %>
+      <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
+        <div class="alert alert-info d-flex align-items-center mt-4">
+          <i class="fa-solid fa-circle-info me-2"></i>
+          Only administrators can add new projects.
+        </div>
+      </div>
+    <% } %>
   </div>
-<% } else { %>
-  <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
-    <div class="alert alert-info d-flex align-items-center mt-4">
-      <i class="fa-solid fa-circle-info me-2"></i>
-      Only administrators can add new projects.
-    </div>
-  </div>
-<% } %>
-</div>
 </main>
 
 <!-- Bootstrap JS -->

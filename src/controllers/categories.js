@@ -31,6 +31,12 @@ const showCategoryDetails = async (req, res) => {
 
   // Récupérer les projets liés à cette catégorie
   const projects = await getProjectsByCategory(categoryId);
+  const organizations = projects.map(p => ({
+    organization_id: p.organization_id,
+    organization_name: p.organization_name,
+    contact_email: p.contact_email
+  }));
+  
 
   const title = category.category_name;
   res.render('categorydetails', {
