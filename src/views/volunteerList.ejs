@@ -1,0 +1,69 @@
+<% const volunteers = volunteers || []; %>
+
+<div class="bg-light p-4 rounded shadow-sm">
+  <!-- Header -->
+  <div class="mb-4 border-bottom pb-2 d-flex justify-content-between align-items-center">
+    <h4 class="mb-0">
+      <i class="fa-solid fa-users me-2 text-primary"></i>
+      Volunteers for Project <%= projectId %>
+    </h4>
+    <a href="/volunteer/new" class="btn btn-success">
+      <i class="fa-solid fa-user-plus me-1"></i> Add Volunteer
+    </a>
+  </div>
+
+  <!-- Volunteer Table -->
+  <table class="table table-striped table-hover align-middle">
+    <thead class="table-secondary">
+      <tr>
+        <th><i class="fa-solid fa-id-card me-1"></i> User ID</th>
+        <th><i class="fa-solid fa-user me-1"></i> Name</th>
+        <th><i class="fa-solid fa-user-tag me-1"></i> Role</th>
+        <th><i class="fa-solid fa-clock me-1"></i> Hours</th>
+        <th><i class="fa-solid fa-circle-check me-1"></i> Status</th>
+        <th><i class="fa-solid fa-calendar-day me-1"></i> Joined</th>
+        <th class="text-center"><i class="fa-solid fa-gear me-1"></i> Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (volunteers.length === 0) { %>
+        <tr>
+          <td colspan="7" class="text-center text-muted">
+            No volunteers assigned yet.
+          </td>
+        </tr>
+      <% } else { %>
+        <% volunteers.forEach(v => { %>
+          <tr>
+            <td><%= v.user_id %></td>
+            <td><%= v.name || 'N/A' %></td>
+            <td><%= v.role || '-' %></td>
+            <td><%= v.hours_committed || 0 %></td>
+            <td>
+              <span class="badge 
+                <%= v.volunteer_status === 'Active' ? 'bg-success' : 
+                    v.volunteer_status === 'Completed' ? 'bg-primary' : 
+                    'bg-danger' %>">
+                <%= v.volunteer_status %>
+              </span>
+            </td>
+            <td><%= v.volunteered_at ? new Date(v.volunteered_at).toLocaleDateString() : '-' %></td>
+            <td class="text-center">
+              <a href="/edit-volunteer/<%= v.user_id %>/<%= v.project_id %>" 
+                 class="btn btn-sm btn-outline-primary me-2">
+                <i class="fa-solid fa-pen-to-square"></i> Edit
+              </a>
+              <form action="/volunteer/remove" method="POST" class="d-inline">
+                <input type="hidden" name="userId" value="<%= v.user_id %>">
+                <input type="hidden" name="projectId" value="<%= v.project_id %>">
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                  <i class="fa-solid fa-trash"></i> Remove
+                </button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      <% } %>
+    </tbody>
+  </table>
+</div>

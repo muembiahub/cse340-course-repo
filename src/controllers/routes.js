@@ -30,7 +30,8 @@ import {
        processNewCategoryForm,
         showEditCategoryForm,
          processEditCategoryForm,
-          categoryValidation
+          categoryValidation,
+          processDeleteCategoryForm
          }
      from './categories.js';
 
@@ -39,8 +40,22 @@ import { showUserRegistrationForm,
      processUserRegistrationForm, 
      showLoginForm, 
      processLoginForm,
-      processLogout,requireRole,showDashboard, showAdminDashboard,showAdminUsersPage, showAdminUserRoleUpdatePage, processAdminUserRoleUpdatePage} from './user.js';
-import { requireLogin } from '../models/user.js';
+      processLogout,requireRole,showDashboard, 
+      showAdminDashboard,
+      showAdminUsersPage, 
+      showAdminUserRoleUpdatePage, 
+      processAdminUserRoleUpdatePage,
+      showVolunteerRegistrationForm,
+      processVolunteerRegistrationForm, showVolunteerListPage,
+      volunteerValidation,
+      processVolunteerDeleteprojectId
+    
+    } 
+      from './user.js';
+
+
+import { requireLogin,
+ } from '../models/user.js';
 
 import { testErrorPage } from './errors.js';
 
@@ -72,10 +87,26 @@ router.post('/new-category', categoryValidation, requireRole('admin'), processNe
 //  Route for editing category details
 router.get('/edit-category/:id', requireRole('admin'), showEditCategoryForm);
 router.post('/edit-category/:id', categoryValidation, requireRole('admin'), processEditCategoryForm);
+router.post('/delete-category/:id', requireRole('admin'), processDeleteCategoryForm);
 
 // Routes to handle the assign categories to project form
 router.get('/assign-categories/:projectId',requireRole('admin'), showAssignCategoriesForm);
 router.post('/assign-categories/:projectId', requireRole('admin'), processAssignCategoriesForm);
+
+// Show the volunteer registration form
+router.get('/volunteer/registration/:projectId', showVolunteerRegistrationForm);
+
+// Handle new volunteer registration
+router.post('/volunteer/registration/:projectId', processVolunteerRegistrationForm);
+
+// // Handle volunteer update/edit
+// router.post('/volunteer/update/:userId/:projectId', processVolunteerUpdateForm);
+
+// // Handle volunteer delete
+// router.post('/volunteer/delete/:userId/:projectId', processVolunteerDeleteForm);
+
+router.get('/dashboard/volunteer',volunteerValidation, requireLogin, showVolunteerListPage);
+router.post('/volunteer/delete/:projectId',requireLogin, processVolunteerDeleteprojectId);
 
 
 // User registration routes
@@ -93,6 +124,7 @@ router.get('/admin-dashboard', requireLogin, showAdminDashboard);
 router.get('/admin/users', requireRole('admin'), showAdminUsersPage);
 router.get('/admin/users/:id/updateRole', requireRole('admin'), showAdminUserRoleUpdatePage);
 router.post('/admin/users/:id/updateRole', requireRole('admin'), processAdminUserRoleUpdatePage);
+
 
 // error-handling routes
 router.get('/test-error', testErrorPage);

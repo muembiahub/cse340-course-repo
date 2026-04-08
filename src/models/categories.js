@@ -111,7 +111,16 @@ const getCategoryById = async (categoryId) => {
   return result.rows[0];
 };
 
+// delete category function =================
+const deleteCategory = async (categoryId) => {
+  const query = `
+    DELETE FROM categories
+    WHERE category_id = $1;
+  `;
+  await db.query(query, [categoryId]);
+};
+
 //  =================== export function ================================
 //   This function will be used to get all the categories from the database and return them as an array of objects. It executes a SELECT query to retrieve all the records from the categories table and returns the result as an array of objects.
 export { getAllCategories, getProjectsByCategory,
-   getAllCategoriesWithProjects,updateCategoryAssignments, createCategory, updateCategory, getCategoryById};
+   getAllCategoriesWithProjects,updateCategoryAssignments, createCategory, updateCategory, getCategoryById, deleteCategory};

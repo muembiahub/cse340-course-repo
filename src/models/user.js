@@ -137,18 +137,234 @@ const updateUserRole = async (userId, roleId) => {
   const result = await db.query(query, [roleId, userId]);
   return result.rows;
 }
-//  down  role function =================
 
-const downgradeUserRole = async (userId) => {
-    const query = `
-    UPDATE users
-    SET role_id = (SELECT role_id FROM roles WHERE role_name = 'user')
-    WHERE user_id = $1
+
+ 
+
+
+
+/**
+ * ======================================================
+ * Volunteer Model
+ * ======================================================
+ * Rules enforced:
+ * - Always pass (userId, projectId) in that order
+ * - Never trust the caller for authorization
+ * - Always return deterministic values
+ * ======================================================
+ */
+
+/**
+ * Get all projects a user has volunteered for
+ */
+const getVolunteerProjects = async (userId) => {
+  const query = `
+    SELECT
+      p.project_id,
+      p.title AS project_title,
+      p.description,
+      p.location,
+      p.project_date,
+      v.role_type,
+      v.hours_committed,
+      v.date_to_start,
+      v.status AS volunteer_status
+    FROM service_projects p
+    INNER JOIN volunteer v
+      ON p.project_id = v.project_id
+    WHERE v.user_id = $1
+    ORDER BY p.project_date DESC
   `;
 
-  const result = await db.query(query, [userId]);
-  return result.rows;
-}
+  try {
+    const { rows } = await db.query(query, [userId]);
+    return rows;
+  } catch (error) {
+    console.error("Error fetching volunteer projects:", error);
+    throw error;
+  }
+};
 
+/**
+ * Get all volunteers assigned to a specific project
+ */
+const getProjectVolunteers = async (projectId) => {
+  const query = `
+    SELECT
+      u.user_id,
+      u.name,
+      v.role_type,
+      v.hours_committed,
+      v.status AS volunteer_status,
+      v.volunteered_at
+    FROM Users u
+    INNER JOIN volunteer v
+      ON u.user_id = v.user_id
+    WHERE v.project_id = $1
+    ORDER BY u.name
+  `;
 
-export { createUser , findUserByEmail, findUserById, getAllUsers, verifyPassword , authenticateUser , requireLogin ,getAllRoles, updateUserRole , downgradeUserRole };
+  try {
+    const { rows } = await db.query(query, [projectId]);
+    return rows;
+  } catch (error) {
+    console.error("Error fetching project volunteers:", error);
+    throw error;
+  }
+};
+
+/**
+ * Check if a user is already assigned to a project
+ */
+const isVolunteerAssigned = async (userId, projectId) => {
+  const query = `
+    SELECT 1
+    FROM volunteer
+    WHERE user_id = $1 AND project_id = $2
+    LIMIT 1
+  `;
+
+  try {
+    const { rowCount } = await db.query(query, [userId, projectId]);
+    return rowCount > 0;
+  } catch (error) {
+    console.error("Error checking volunteer assignment:", error);
+    throw error;
+  }
+};
+
+/**
+ * Get a volunteer record by user and project
+ */
+const getVolunteerByUserAndProject = async (userId, projectId) => {
+  const query = `
+    SELECT *
+    FROM volunteer
+    WHERE user_id = $1 AND project_id = $2
+    LIMIT 1
+  `;
+
+  try {
+    const { rows } = await db.query(query, [userId, projectId]);
+    return rows[0] || null;
+  } catch (error) {
+    console.error("Error fetching volunteer:", error);
+    throw error;
+  }
+};
+
+/**
+ * Register a new volunteer
+ */
+const volunteeRegistration = async (
+  userId,
+  projectId,
+  roleType,
+  hoursCommitted,
+  status = "Active",
+  dateToStart
+) => {
+  const query = `
+    INSERT INTO volunteer (
+      user_id,
+      project_id,
+      role_type,
+      hours_committed,
+      status,
+      date_to_start
+    )
+    VALUES ($1, $2, $3, $4, $5, $6)
+    RETURNING *;
+  `;
+
+  try {
+    const { rows } = await db.query(query, [
+      userId,
+      projectId,
+      roleType,
+      hoursCommitted,
+      status,
+      dateToStart
+    ]);
+    return rows[0];
+  } catch (error) {
+    console.error("Error registering volunteer:", error);
+    throw error;
+  }
+};
+
+/**
+ * Update an existing volunteer assignment
+ */
+const updateVolunteer = async (
+  volunteerId,
+  roleType,
+  hoursCommitted,
+  status,
+  dateToStart
+) => {
+  const query = `
+    UPDATE volunteer
+    SET
+      role_type = $2,
+      hours_committed = $3,
+      status = $4,
+      date_to_start = $5
+    WHERE id = $1
+    RETURNING *;
+  `;
+
+  try {
+    const { rows } = await db.query(query, [
+      volunteerId,
+      roleType,
+      hoursCommitted,
+      status,
+      dateToStart
+    ]);
+    return rows[0];
+  } catch (error) {
+    console.error("Error updating volunteer:", error);
+    throw error;
+  }
+};
+
+/**
+ * Delete a volunteer assignment
+ * IMPORTANT: order must be (userId, projectId)
+ */
+const deleteVolunteerAssignment = async (userId, projectId) => {
+  const query = `
+    DELETE FROM volunteer
+    WHERE user_id = $1 AND project_id = $2
+    RETURNING *;
+  `;
+
+  try {
+    const { rows } = await db.query(query, [userId, projectId]);
+    return rows[0] || null;
+  } catch (error) {
+    console.error("Error deleting volunteer assignment:", error);
+    throw error;
+  }
+};
+
+/**
+ * ======================================================
+ * EXPORTS
+ * ======================================================
+ */
+
+export { createUser ,
+     findUserByEmail, 
+     findUserById, getAllUsers, 
+     verifyPassword , authenticateUser , 
+     requireLogin ,getAllRoles,
+      updateUserRole,
+     getProjectVolunteers,
+     getVolunteerProjects,
+     isVolunteerAssigned,
+     getVolunteerByUserAndProject,
+     volunteeRegistration,
+      deleteVolunteerAssignment
+    };

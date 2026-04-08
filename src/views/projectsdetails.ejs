@@ -79,6 +79,23 @@
               <%= project.organization_name %>
             </a>
           </p>
+          <p>
+  <strong>Want to Involve in?</strong>
+  <a class="btn btn-link" data-bs-toggle="collapse" href="#volunteerForm<%= project.project_id %>">
+    Click here to register
+  </a>
+</p>
+
+<div class="collapse" id="volunteerForm<%= project.project_id %>">
+  <%- include('partials/volunteer-registration', {
+  mode: 'create',
+  project_id: project.project_id,
+  project: project,
+  volunteer: null,
+  user: user
+}) %>
+
+</div>
 
         </div>
       </div>

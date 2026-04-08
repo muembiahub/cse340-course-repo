@@ -1,0 +1,147 @@
+<% const v = volunteer || {}; %>
+
+<form
+  action="<%= mode === 'edit'
+    ? '/volunteer/update/' + project.project_id
+    : '/volunteer/registration/' + project.project_id %>"
+  method="POST"
+  class="needs-validation bg-light p-4 rounded shadow-sm"
+  novalidate
+>
+
+  <!-- ================= Header ================= -->
+  <div class="mb-4 border-bottom pb-2">
+    <h4 class="mb-0">
+      <i class="fa-solid fa-handshake-angle me-2 text-primary"></i>
+      <%= mode === 'edit'
+        ? 'Edit Volunteer Assignment'
+        : 'Volunteer Registration' %>
+    </h4>
+    <small class="text-muted">Please complete all required fields</small>
+  </div>
+
+  <!-- ================= User ================= -->
+  <div class="mb-3">
+    <label class="form-label fw-semibold">
+      <i class="fa-solid fa-user me-1 text-secondary"></i> User
+    </label>
+    <input
+      type="text"
+      class="form-control"
+      value="<%= user.name %>"
+      readonly
+    >
+    <!-- userId is NOT trusted server-side, but kept for convenience -->
+    <input type="hidden" name="userId" value="<%= user.id %>">
+  </div>
+
+  <!-- ================= Project ================= -->
+  <div class="mb-3">
+    <label class="form-label fw-semibold">
+      <i class="fa-solid fa-clipboard-list me-1 text-secondary"></i> Project
+    </label>
+    <input
+      type="text"
+      class="form-control"
+      value="<%= project.project_title %>"
+      readonly
+    >
+    <input type="hidden" name="projectId" value="<%= project.project_id %>">
+  </div>
+
+  <!-- ================= Role Type ================= -->
+  <div class="mb-3">
+    <label class="form-label fw-semibold">
+      <i class="fa-solid fa-user-tag me-1 text-secondary"></i> Role Type
+    </label>
+
+    <select name="roleType" class="form-select" required>
+      <option value="">Select role type</option>
+
+      <% const ROLE_TYPES = [
+        "Administrative Support",
+        "Event Volunteer",
+        "Fundraising Volunteer",
+        "Mentor / Tutor",
+        "Healthcare Support",
+        "Technical Volunteer",
+        "Community Outreach",
+        "Environmental Volunteer"
+      ]; %>
+
+      <% ROLE_TYPES.forEach(role => { %>
+        <option
+          value="<%= role %>"
+          <%= v.role_type === role ? 'selected' : '' %>
+        >
+          <%= role %>
+        </option>
+      <% }) %>
+    </select>
+
+    <div class="invalid-feedback">
+      Please select a valid role type.
+    </div>
+  </div>
+
+  <!-- ================= Hours ================= -->
+  <div class="mb-3">
+    <label class="form-label fw-semibold">
+      <i class="fa-solid fa-clock me-1 text-secondary"></i> Hours Committed
+    </label>
+    <input
+      type="number"
+      name="hours_committed"
+      class="form-control"
+      min="1"
+      placeholder="Enter hours"
+      value="<%= v.hours_committed ?? '' %>"
+      required
+    >
+    <div class="invalid-feedback">
+      Hours must be at least 1.
+    </div>
+  </div>
+
+  <!-- ================= Date ================= -->
+  <div class="mb-3">
+    <label class="form-label fw-semibold">
+      <i class="fa-solid fa-calendar me-1 text-secondary"></i> Date to Start
+    </label>
+    <input
+      type="date"
+      name="date_to_start"
+      class="form-control"
+      value="<%= v.date_to_start
+        ? new Date(v.date_to_start).toISOString().split('T')[0]
+        : '' %>"
+      required
+    >
+    <div class="invalid-feedback">
+      Please provide a valid start date.
+    </div>
+  </div>
+
+  <!-- ================= Actions ================= -->
+  <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+    <button type="submit" class="btn btn-success px-4">
+      <i class="fa-solid fa-floppy-disk me-1"></i>
+      <%= mode === 'edit' ? 'Update Volunteer' : 'Register' %>
+    </button>
+
+    <a href="/projects" class="btn btn-outline-secondary">
+      <i class="fa-solid fa-xmark me-1"></i> Cancel
+    </a>
+
+    <% if (mode === 'edit') { %>
+      <button
+        type="button"
+        class="btn btn-danger"
+        data-bs-toggle="modal"
+        data-bs-target="#confirmDeleteModal"
+      >
+        <i class="fa-solid fa-trash me-1"></i> Delete
+      </button>
+    <% } %>
+  </div>
+</form>

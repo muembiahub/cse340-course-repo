@@ -1,11 +1,22 @@
 import bcrypt from 'bcrypt';
+import { body, validationResult} from 'express-validator';
 
-import { createUser,authenticateUser, getAllUsers,findUserById ,getAllRoles, updateUserRole } from '../models/user.js';
+import { createUser,authenticateUser,
+     getAllUsers,findUserById ,
+     getAllRoles, 
+     updateUserRole,
+     getVolunteerByUserAndProject,
+     volunteeRegistration,
+     getVolunteerProjects,
+      deleteVolunteerAssignment
+     } from '../models/user.js';
+import { getProjectsDetails} from '../models/projects.js';
+
 
 const showUserRegistrationForm = (req, res) => {
     res.render('register', { title: 'Register' });
 };
-
+ 
 const processUserRegistrationForm = async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -166,12 +177,241 @@ const processAdminUserRoleUpdatePage = async (req, res) => {
         res.redirect('/admin/users');
 
     }
+
 }
 
+
+
+// =======================================================
+// CONSTANTS
+// =======================================================
+const ROLE_TYPES = [
+  "Administrative Support",
+  "Event Volunteer",
+  "Fundraising Volunteer",
+  "Mentor / Tutor",
+  "Healthcare Support",
+  "Technical Volunteer",
+  "Community Outreach",
+  "Environmental Volunteer"
+];
+
+// =======================================================
+// VALIDATION
+// =======================================================
+const volunteerValidation = [
+  body("roleType")
+    .notEmpty()
+    .withMessage("Role type is required")
+    .isIn(ROLE_TYPES)
+    .withMessage("Invalid role type selected"),
+
+  body("hours_committed")
+    .notEmpty()
+    .withMessage("Hours committed is required")
+    .toInt()
+    .isInt({ min: 1 })
+    .withMessage("Hours must be at least 1"),
+
+  body("date_to_start")
+    .notEmpty()
+    .withMessage("Date to start is required")
+    .isISO8601()
+    .withMessage("Date to start must be a valid date")
+];
+
+// =======================================================
+// VOLUNTEER LIST PAGE
+// =======================================================
+const showVolunteerListPage = async (req, res) => {
+  try {
+    const user = req.session.user;
+    if (!user) {
+      return res.status(401).render("errors/401", {
+        title: "Unauthorized",
+        message: "You must be logged in to view your volunteer list"
+      });
+    }
+
+    const volunteers = await getVolunteerProjects(user.id);
+
+    res.render("dashboard/volunteer-list", {
+      title: "Volunteer List",
+      volunteers
+    });
+  } catch (error) {
+    console.error("Error retrieving volunteers:", error);
+    req.flash("error", "An error occurred while retrieving volunteers.");
+    res.redirect("/dashboard");
+  }
+};
+
+// =======================================================
+// SHOW VOLUNTEER REGISTRATION FORM (CREATE / EDIT)
+// =======================================================
+const showVolunteerRegistrationForm = async (req, res) => {
+  try {
+    const user = req.session.user;
+    if (!user) {
+      return res.status(401).render("errors/401", {
+        title: "Unauthorized",
+        message: "You must be logged in to continue"
+      });
+    }
+
+    const projectId = parseInt(req.params.projectId, 10);
+    if (Number.isNaN(projectId)) {
+      return res.status(400).render("errors/400", {
+        title: "Invalid Request",
+        message: "Invalid project ID"
+      });
+    }
+
+    const project = await getProjectsDetails(projectId);
+    if (!project) {
+      return res.status(404).render("errors/404", {
+        title: "Not Found",
+        message: "Project not found"
+      });
+    }
+
+    const volunteer = await getVolunteerByUserAndProject(user.user_id, projectId);
+    const mode = volunteer ? "edit" : "create";
+
+    res.render("partials/volunteer-registration", {
+      title: mode === "edit"
+        ? "Edit Volunteer Assignment"
+        : "Volunteer Registration",
+      user,
+      project,
+      volunteer,
+      mode
+    });
+  } catch (error) {
+    console.error("Error loading volunteer form:", error);
+    res.status(500).render("errors/500", {
+      title: "Server Error",
+      message: "Unable to load volunteer registration form"
+    });
+  }
+};
+
+// =======================================================
+// PROCESS VOLUNTEER REGISTRATION (CREATE / UPDATE)
+// =======================================================
+const processVolunteerRegistrationForm = async (req, res) => {
+  try {
+    const user = req.session.user;
+    if (!user) {
+      return res.status(401).render("errors/401", {
+        title: "Unauthorized",
+        message: "You must be logged in to register as a volunteer"
+      });
+    }
+
+    const projectId = parseInt(req.params.projectId, 10);
+    if (Number.isNaN(projectId)) {
+      return res.status(400).render("errors/400", {
+        title: "Invalid Request",
+        message: "Invalid project ID"
+      });
+    }
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const project = await getProjectsDetails(projectId);
+      return res.status(400).render("partials/volunteer-registration", {
+        title: "Volunteer Registration",
+        user,
+        project,
+        volunteer: req.body,
+        errors: errors.array(),
+        mode: "create"
+      });
+    }
+
+    const { roleType, hours_committed, date_to_start, status } = req.body;
+
+    const existingVolunteer =
+      await getVolunteerByUserAndProject(user.user_id, projectId);
+
+    if (existingVolunteer) {
+      await updateVolunteer(
+        existingVolunteer.id,
+        roleType,
+        hours_committed,
+        status || "Active",
+        date_to_start
+      );
+    } else {
+      await volunteeRegistration(
+        user.id,
+        projectId,
+        roleType,
+        hours_committed,
+        status || "Active",
+        date_to_start
+      );
+    }
+
+    res.redirect("/dashboard/volunteer");
+  } catch (error) {
+    console.error("Error processing volunteer registration:", error);
+    res.status(500).render("errors/500", {
+      title: "Server Error",
+      message: "Unable to process volunteer registration"
+    });
+  }
+};
+
+// =======================================================
+// DELETE VOLUNTEER ASSIGNMENT
+// =======================================================
+const processVolunteerDeleteprojectId = async (req, res) => {
+  try {
+    const user = req.session.user;
+    if (!user) {
+      return res.status(401).render("errors/401", {
+        title: "Unauthorized",
+        message: "You must be logged in to delete a volunteer assignment"
+      });
+    }
+
+    const projectId = parseInt(req.params.projectId, 10);
+    if (Number.isNaN(projectId)) {
+      req.flash("error", "Invalid project ID.");
+      return res.redirect("/dashboard/volunteer");
+    }
+
+    const deleted =
+      await deleteVolunteerAssignment(user.user_id, projectId);
+
+    if (!deleted) {
+      req.flash("error", "No volunteer assignment found to delete.");
+    } else {
+      req.flash("success", "Volunteer assignment deleted successfully.");
+    }
+
+    res.redirect("/dashboard/volunteer");
+  } catch (error) {
+    console.error("Error deleting volunteer assignment:", error);
+    req.flash("error", "Unable to delete volunteer assignment.");
+    res.redirect("/dashboard/volunteer");
+  }
+};
+
+// =======================================================
 
 export { showUserRegistrationForm,
      processUserRegistrationForm, 
      showLoginForm, 
      processLoginForm,
       processLogout,requireRole, showDashboard, showAdminDashboard ,
-       showAdminUsersPage, showAdminUserRoleUpdatePage, processAdminUserRoleUpdatePage};
+       showAdminUsersPage, showAdminUserRoleUpdatePage,
+        processAdminUserRoleUpdatePage,
+        showVolunteerListPage,
+        showVolunteerRegistrationForm,
+        processVolunteerRegistrationForm,
+        processVolunteerDeleteprojectId,
+        volunteerValidation
+    };

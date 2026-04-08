@@ -76,12 +76,21 @@
           </li>
 
           <% if (isLoggedIn) { %>
+        
             <!-- Role Badge -->
             <li class="nav-item">
               <span class="badge bg-light text-primary px-3 py-2">
                 <i class="fa-solid fa-user-shield me-1"></i>
                 <%= role %>
               </span>
+            </li>
+            <!-- Volunteer page  -->
+
+
+            <li class="nav-item">
+              <a class="nav-link" href="/dashboard/volunteer">
+                <i class="fa-solid fa-user-group me-1"></i>Volunteer
+              </a>
             </li>
 
             <!-- Logout -->
