@@ -1,15 +1,22 @@
-<% const v = volunteer || {}; %>
+
+<% 
+// Normalize volunteer object so form works for BOTH create and edit
+const v = volunteer || {};
+%>
 
 <form
   action="<%= mode === 'edit'
     ? '/volunteer/update/' + project.project_id
     : '/volunteer/registration/' + project.project_id %>"
   method="POST"
-  class="needs-validation bg-light p-4 rounded shadow-sm"
+  class="bg-light p-4 rounded shadow-sm"
   novalidate
 >
 
-  <!-- ================= Header ================= -->
+  <!-- REQUIRED: MODE FLAG -->
+  <input type="hidden" name="mode" value="<%= mode %>">
+
+  <!-- ================= HEADER ================= -->
   <div class="mb-4 border-bottom pb-2">
     <h4 class="mb-0">
       <i class="fa-solid fa-handshake-angle me-2 text-primary"></i>
@@ -20,7 +27,7 @@
     <small class="text-muted">Please complete all required fields</small>
   </div>
 
-  <!-- ================= User ================= -->
+  <!-- ================= USER (DISPLAY ONLY) ================= -->
   <div class="mb-3">
     <label class="form-label fw-semibold">
       <i class="fa-solid fa-user me-1 text-secondary"></i> User
@@ -28,14 +35,12 @@
     <input
       type="text"
       class="form-control"
-      value="<%= user.name %>"
+      value="<%= user.user_id %>"
       readonly
     >
-    <!-- userId is NOT trusted server-side, but kept for convenience -->
-    <input type="hidden" name="userId" value="<%= user.id %>">
   </div>
 
-  <!-- ================= Project ================= -->
+  <!-- ================= PROJECT ================= -->
   <div class="mb-3">
     <label class="form-label fw-semibold">
       <i class="fa-solid fa-clipboard-list me-1 text-secondary"></i> Project
@@ -44,12 +49,18 @@
       type="text"
       class="form-control"
       value="<%= project.project_title %>"
-      readonly
+      if="mode === 'edit'
+        ? readonly
+        : ''"
     >
-    <input type="hidden" name="projectId" value="<%= project.project_id %>">
+    <input
+      type="hidden"
+      name="projectId"
+      value="<%= project.project_id %>"
+    >
   </div>
 
-  <!-- ================= Role Type ================= -->
+  <!-- ================= ROLE TYPE ================= -->
   <div class="mb-3">
     <label class="form-label fw-semibold">
       <i class="fa-solid fa-user-tag me-1 text-secondary"></i> Role Type
@@ -78,70 +89,49 @@
         </option>
       <% }) %>
     </select>
-
-    <div class="invalid-feedback">
-      Please select a valid role type.
-    </div>
   </div>
 
-  <!-- ================= Hours ================= -->
+  <!-- ================= HOURS COMMITTED ================= -->
   <div class="mb-3">
     <label class="form-label fw-semibold">
       <i class="fa-solid fa-clock me-1 text-secondary"></i> Hours Committed
     </label>
     <input
       type="number"
-      name="hours_committed"
+      name="hoursCommitted"
       class="form-control"
       min="1"
-      placeholder="Enter hours"
       value="<%= v.hours_committed ?? '' %>"
       required
     >
-    <div class="invalid-feedback">
-      Hours must be at least 1.
-    </div>
   </div>
 
-  <!-- ================= Date ================= -->
+  <!-- ================= DATE TO START ================= -->
   <div class="mb-3">
     <label class="form-label fw-semibold">
       <i class="fa-solid fa-calendar me-1 text-secondary"></i> Date to Start
     </label>
     <input
       type="date"
-      name="date_to_start"
+      name="dateToStart"
       class="form-control"
       value="<%= v.date_to_start
         ? new Date(v.date_to_start).toISOString().split('T')[0]
         : '' %>"
       required
     >
-    <div class="invalid-feedback">
-      Please provide a valid start date.
-    </div>
   </div>
 
-  <!-- ================= Actions ================= -->
+  <!-- ================= ACTIONS ================= -->
   <div class="d-flex justify-content-between align-items-center pt-3 border-top">
     <button type="submit" class="btn btn-success px-4">
       <i class="fa-solid fa-floppy-disk me-1"></i>
       <%= mode === 'edit' ? 'Update Volunteer' : 'Register' %>
     </button>
 
-    <a href="/projects" class="btn btn-outline-secondary">
+    <a href="/dashboard/volunteer" class="btn btn-outline-secondary">
       <i class="fa-solid fa-xmark me-1"></i> Cancel
     </a>
-
-    <% if (mode === 'edit') { %>
-      <button
-        type="button"
-        class="btn btn-danger"
-        data-bs-toggle="modal"
-        data-bs-target="#confirmDeleteModal"
-      >
-        <i class="fa-solid fa-trash me-1"></i> Delete
-      </button>
-    <% } %>
   </div>
+
 </form>

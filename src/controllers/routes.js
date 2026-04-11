@@ -48,7 +48,8 @@ import { showUserRegistrationForm,
       showVolunteerRegistrationForm,
       processVolunteerRegistrationForm, showVolunteerListPage,
       volunteerValidation,
-      processVolunteerDeleteprojectId
+      processVolunteerDeleteprojectId,
+      processVolunteerUpdateForm
     
     } 
       from './user.js';
@@ -97,10 +98,10 @@ router.post('/assign-categories/:projectId', requireRole('admin'), processAssign
 router.get('/volunteer/registration/:projectId', showVolunteerRegistrationForm);
 
 // Handle new volunteer registration
-router.post('/volunteer/registration/:projectId', processVolunteerRegistrationForm);
+router.post('/volunteer/registration/:projectId', volunteerValidation,requireLogin, processVolunteerRegistrationForm);
 
-// // Handle volunteer update/edit
-// router.post('/volunteer/update/:userId/:projectId', processVolunteerUpdateForm);
+// Handle volunteer update/edit
+router.post('/volunteer/update/:projectId', volunteerValidation, requireLogin, processVolunteerUpdateForm);
 
 // // Handle volunteer delete
 // router.post('/volunteer/delete/:userId/:projectId', processVolunteerDeleteForm);

@@ -6,9 +6,10 @@ import { createUser,authenticateUser,
      getAllRoles, 
      updateUserRole,
      getVolunteerByUserAndProject,
-     volunteeRegistration,
+     registerVolunteer,
      getVolunteerProjects,
-      deleteVolunteerAssignment
+      deleteVolunteerAssignment,
+      updateVolunteerAssignment
      } from '../models/user.js';
 import { getProjectsDetails} from '../models/projects.js';
 
@@ -182,9 +183,11 @@ const processAdminUserRoleUpdatePage = async (req, res) => {
 
 
 
+
 // =======================================================
-// CONSTANTS
+// VOLUNTEER REGISTRATION VALIDATION
 // =======================================================
+
 const ROLE_TYPES = [
   "Administrative Support",
   "Event Volunteer",
@@ -196,28 +199,34 @@ const ROLE_TYPES = [
   "Environmental Volunteer"
 ];
 
-// =======================================================
-// VALIDATION
-// =======================================================
 const volunteerValidation = [
+
+  // Project
+  body("projectId")
+    .notEmpty()
+    .withMessage("Project is required"),
+
+  // Role type
   body("roleType")
     .notEmpty()
     .withMessage("Role type is required")
     .isIn(ROLE_TYPES)
     .withMessage("Invalid role type selected"),
 
-  body("hours_committed")
+  // Hours committed
+  body("hoursCommitted")
     .notEmpty()
     .withMessage("Hours committed is required")
-    .toInt()
     .isInt({ min: 1 })
-    .withMessage("Hours must be at least 1"),
+    .withMessage("Hours must be at least 1")
+    .toInt(),
 
-  body("date_to_start")
+  // Start date
+  body("dateToStart")
     .notEmpty()
     .withMessage("Date to start is required")
     .isISO8601()
-    .withMessage("Date to start must be a valid date")
+    .withMessage("Date must be a valid date")
 ];
 
 // =======================================================
@@ -233,7 +242,7 @@ const showVolunteerListPage = async (req, res) => {
       });
     }
 
-    const volunteers = await getVolunteerProjects(user.id);
+    const volunteers = await getVolunteerProjects(user.user_id);
 
     res.render("dashboard/volunteer-list", {
       title: "Volunteer List",
@@ -295,21 +304,23 @@ const showVolunteerRegistrationForm = async (req, res) => {
     });
   }
 };
-
 // =======================================================
-// PROCESS VOLUNTEER REGISTRATION (CREATE / UPDATE)
+// PROCESS VOLUNTEER REGISTRATION FORM (CREATE)
 // =======================================================
 const processVolunteerRegistrationForm = async (req, res) => {
   try {
+    // ---------------------------------------------------
+    // 1. Check authentication
+    // ---------------------------------------------------
     const user = req.session.user;
     if (!user) {
-      return res.status(401).render("errors/401", {
-        title: "Unauthorized",
-        message: "You must be logged in to register as a volunteer"
-      });
+      return res.redirect("/login");
     }
 
-    const projectId = parseInt(req.params.projectId, 10);
+    // ---------------------------------------------------
+    // 2. Extract and validate project ID
+    // ---------------------------------------------------
+    const projectId = parseInt(req.body.projectId, 10);
     if (Number.isNaN(projectId)) {
       return res.status(400).render("errors/400", {
         title: "Invalid Request",
@@ -317,52 +328,138 @@ const processVolunteerRegistrationForm = async (req, res) => {
       });
     }
 
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const project = await getProjectsDetails(projectId);
-      return res.status(400).render("partials/volunteer-registration", {
-        title: "Volunteer Registration",
-        user,
-        project,
-        volunteer: req.body,
-        errors: errors.array(),
-        mode: "create"
+    // ---------------------------------------------------
+    // 3. Reload project from database
+    // ---------------------------------------------------
+    const project = await getProjectsDetails(projectId);
+    if (!project) {
+      return res.status(404).render("errors/404", {
+        title: "Not Found",
+        message: "Project not found"
       });
     }
 
-    const { roleType, hours_committed, date_to_start, status } = req.body;
-
-    const existingVolunteer =
-      await getVolunteerByUserAndProject(user.user_id, projectId);
-
-    if (existingVolunteer) {
-      await updateVolunteer(
-        existingVolunteer.id,
-        roleType,
-        hours_committed,
-        status || "Active",
-        date_to_start
-      );
-    } else {
-      await volunteeRegistration(
-        user.id,
-        projectId,
-        roleType,
-        hours_committed,
-        status || "Active",
-        date_to_start
-      );
+    // ---------------------------------------------------
+    // 4. Validate form input
+    // ---------------------------------------------------
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).render("partials/volunteer-registration", {
+        title: "Volunteer Registration",
+        mode: "create",
+        user,
+        project,
+        volunteer: req.body,      // refill form
+        errors: errors.array()
+      });
     }
 
-    res.redirect("/dashboard/volunteer");
-  } catch (error) {
-    console.error("Error processing volunteer registration:", error);
-    res.status(500).render("errors/500", {
+    const { roleType, hoursCommitted, dateToStart } = req.body;
+
+    // ---------------------------------------------------
+    // 5. Prevent duplicate registration
+    // ---------------------------------------------------
+    const existingAssignment =
+      await getVolunteerByUserAndProject(user.user_id, projectId);
+
+    if (existingAssignment) {
+      return res.status(400).render("partials/volunteer-registration", {
+        title: "Volunteer Registration",
+        mode: "create",
+        user,
+        project,
+        volunteer: req.body,
+      });
+    req.flash("error", "You are already registered for this project. Please edit your existing registration if you want to make changes.");
+
+    }
+
+      // ---------------------------------------------------
+    // 6. Create volunteer registration
+    // ---------------------------------------------------
+    await registerVolunteer(
+      user.user_id,
+      projectId,
+      roleType,
+      hoursCommitted,
+      "Pending",
+      dateToStart
+    );
+
+    // ---------------------------------------------------
+    // 7. Redirect on success
+    // ---------------------------------------------------
+    req.flash("success", "Volunteer registration successful!");
+    return res.redirect("/dashboard/volunteer");
+
+  } catch (err) {
+    console.error("Error processing volunteer registration:", err);
+
+    return res.status(500).render("errors/500", {
       title: "Server Error",
-      message: "Unable to process volunteer registration"
+      message: "Unable to process volunteer registration",
+      error: err.message,
+      stack: process.env.NODE_ENV === "development" ? err.stack : null
     });
   }
 };
+
+
+// ---------------------------------------------------
+// PROCESS VOLUNTEER UPDATE (EDIT MODE)
+// ---------------------------------------------------
+const processVolunteerUpdateForm = async (req, res) => {
+  try {
+    // 1️⃣ Authentication check
+    const user = req.session.user;
+    if (!user) {
+      return res.status(401).render("errors/401", {
+        title: "Unauthorized",
+        message: "You must be logged in to continue"
+      });
+    }
+
+    // 2️⃣ Validate project ID
+    const projectId = parseInt(req.params.projectId, 10);
+    if (Number.isNaN(projectId)) {
+      req.flash("error", "Invalid project ID.");
+      return res.redirect("/dashboard/volunteer");
+    }
+
+    // 3️⃣ Extract form data
+    const { roleType, hoursCommitted, dateToStart, mode } = req.body;
+
+    // 4️⃣ Ensure correct mode
+    if (mode !== "edit") {
+      req.flash("error", "Invalid operation.");
+      return res.redirect("/dashboard/volunteer");
+    }
+
+    // 5️⃣ Update volunteer assignment
+    await updateVolunteerAssignment(
+      user.user_id,
+      projectId,
+      roleType,
+      parseInt(hoursCommitted, 10),
+      "Pending",           // status reset after edit
+      dateToStart
+    );
+
+    // 6️⃣ Success feedback
+    req.flash("success", "Volunteer assignment updated successfully!");
+    return res.redirect("/dashboard/volunteer");
+
+  } catch (error) {
+    console.error("Error updating volunteer assignment:", error);
+
+    req.flash(
+      "error",
+      "Something went wrong while updating your volunteer assignment."
+    );
+    return res.redirect("/dashboard/volunteer");
+  }
+};
+
 
 // =======================================================
 // DELETE VOLUNTEER ASSIGNMENT
@@ -400,6 +497,10 @@ const processVolunteerDeleteprojectId = async (req, res) => {
   }
 };
 
+//  validation middleware for volunteer registration form and edit form
+
+
+
 // =======================================================
 
 export { showUserRegistrationForm,
@@ -412,6 +513,7 @@ export { showUserRegistrationForm,
         showVolunteerListPage,
         showVolunteerRegistrationForm,
         processVolunteerRegistrationForm,
+        processVolunteerUpdateForm,
         processVolunteerDeleteprojectId,
         volunteerValidation
     };

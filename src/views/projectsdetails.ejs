@@ -87,14 +87,17 @@
 </p>
 
 <div class="collapse" id="volunteerForm<%= project.project_id %>">
+<% if (user) { %>
   <%- include('partials/volunteer-registration', {
-  mode: 'create',
-  project_id: project.project_id,
-  project: project,
-  volunteer: null,
-  user: user
-}) %>
-
+    mode: 'create',
+    project_id: project.project_id,
+    project: project,
+    volunteer: null,
+    user: user
+  }) %>
+<% } else { %>
+  <p class="text-warning">Please log in to register as a volunteer.</p>
+<% } %>
 </div>
 
         </div>

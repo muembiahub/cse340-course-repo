@@ -141,16 +141,8 @@ const updateUserRole = async (userId, roleId) => {
 
  
 
-
-
 /**
- * ======================================================
- * Volunteer Model
- * ======================================================
- * Rules enforced:
- * - Always pass (userId, projectId) in that order
- * - Never trust the caller for authorization
- * - Always return deterministic values
+ values only * ======================================================
  * ======================================================
  */
 
@@ -158,7 +150,7 @@ const updateUserRole = async (userId, roleId) => {
  * Get all projects a user has volunteered for
  */
 const getVolunteerProjects = async (userId) => {
-  const query = `
+  const sql = `
     SELECT
       p.project_id,
       p.title AS project_title,
@@ -176,20 +168,15 @@ const getVolunteerProjects = async (userId) => {
     ORDER BY p.project_date DESC
   `;
 
-  try {
-    const { rows } = await db.query(query, [userId]);
-    return rows;
-  } catch (error) {
-    console.error("Error fetching volunteer projects:", error);
-    throw error;
-  }
+  const { rows } = await db.query(sql, [userId]);
+  return rows;
 };
 
 /**
- * Get all volunteers assigned to a specific project
+ * Get all volunteers assigned to a project
  */
 const getProjectVolunteers = async (projectId) => {
-  const query = `
+  const sql = `
     SELECT
       u.user_id,
       u.name,
@@ -197,74 +184,46 @@ const getProjectVolunteers = async (projectId) => {
       v.hours_committed,
       v.status AS volunteer_status,
       v.volunteered_at
-    FROM Users u
+    FROM users u
     INNER JOIN volunteer v
       ON u.user_id = v.user_id
     WHERE v.project_id = $1
     ORDER BY u.name
   `;
 
-  try {
-    const { rows } = await db.query(query, [projectId]);
-    return rows;
-  } catch (error) {
-    console.error("Error fetching project volunteers:", error);
-    throw error;
-  }
+  const { rows } = await db.query(sql, [projectId]);
+  return rows;
 };
 
 /**
- * Check if a user is already assigned to a project
- */
-const isVolunteerAssigned = async (userId, projectId) => {
-  const query = `
-    SELECT 1
-    FROM volunteer
-    WHERE user_id = $1 AND project_id = $2
-    LIMIT 1
-  `;
-
-  try {
-    const { rowCount } = await db.query(query, [userId, projectId]);
-    return rowCount > 0;
-  } catch (error) {
-    console.error("Error checking volunteer assignment:", error);
-    throw error;
-  }
-};
-
-/**
- * Get a volunteer record by user and project
+ * Get a volunteer assignment by user and project
+ * Returns null if none exists
  */
 const getVolunteerByUserAndProject = async (userId, projectId) => {
-  const query = `
+  const sql = `
     SELECT *
     FROM volunteer
     WHERE user_id = $1 AND project_id = $2
     LIMIT 1
   `;
 
-  try {
-    const { rows } = await db.query(query, [userId, projectId]);
-    return rows[0] || null;
-  } catch (error) {
-    console.error("Error fetching volunteer:", error);
-    throw error;
-  }
+  const { rows } = await db.query(sql, [userId, projectId]);
+  return rows[0] || null;
 };
 
 /**
  * Register a new volunteer
+ * Duplicate protection is handled in controller
  */
-const volunteeRegistration = async (
+const registerVolunteer = async (
   userId,
   projectId,
   roleType,
   hoursCommitted,
-  status = "Active",
+  status = "Pending",
   dateToStart
 ) => {
-  const query = `
+  const sql = `
     INSERT INTO volunteer (
       user_id,
       project_id,
@@ -274,60 +233,24 @@ const volunteeRegistration = async (
       date_to_start
     )
     VALUES ($1, $2, $3, $4, $5, $6)
-    RETURNING *;
+    RETURNING user_id, project_id
   `;
 
-  try {
-    const { rows } = await db.query(query, [
-      userId,
-      projectId,
-      roleType,
-      hoursCommitted,
-      status,
-      dateToStart
-    ]);
-    return rows[0];
-  } catch (error) {
-    console.error("Error registering volunteer:", error);
-    throw error;
-  }
+  const { rows } = await db.query(sql, [
+    userId,
+    projectId,
+    roleType,
+    hoursCommitted,
+    status,
+    dateToStart
+  ]);
+
+  return rows[0];
 };
 
-/**
- * Update an existing volunteer assignment
- */
-const updateVolunteer = async (
-  volunteerId,
-  roleType,
-  hoursCommitted,
-  status,
-  dateToStart
-) => {
-  const query = `
-    UPDATE volunteer
-    SET
-      role_type = $2,
-      hours_committed = $3,
-      status = $4,
-      date_to_start = $5
-    WHERE id = $1
-    RETURNING *;
-  `;
 
-  try {
-    const { rows } = await db.query(query, [
-      volunteerId,
-      roleType,
-      hoursCommitted,
-      status,
-      dateToStart
-    ]);
-    return rows[0];
-  } catch (error) {
-    console.error("Error updating volunteer:", error);
-    throw error;
-  }
-};
+
+
 
 /**
  * Delete a volunteer assignment
@@ -349,6 +272,41 @@ const deleteVolunteerAssignment = async (userId, projectId) => {
   }
 };
 
+
+// update volunteer assignment function =================
+const updateVolunteerAssignment = async (
+  userId,
+  projectId,
+  roleType,
+  hoursCommitted,
+  status = "Pending",
+  dateToStart
+) => {
+  const sql = `
+    UPDATE volunteer
+    SET
+      role_type = $1,
+      hours_committed = $2,
+      status = $3,
+      date_to_start = $4
+    WHERE
+      user_id = $5
+      AND project_id = $6
+    RETURNING *;
+  `;
+
+  const { rows } = await db.query(sql, [
+    roleType,
+    hoursCommitted,
+    status,
+    dateToStart,
+    userId,
+    projectId
+  ]);
+
+  return rows[0];
+};
+
 /**
  * ======================================================
  * EXPORTS
@@ -363,8 +321,8 @@ export { createUser ,
       updateUserRole,
      getProjectVolunteers,
      getVolunteerProjects,
-     isVolunteerAssigned,
      getVolunteerByUserAndProject,
-     volunteeRegistration,
-      deleteVolunteerAssignment
+     registerVolunteer,
+      deleteVolunteerAssignment,
+      updateVolunteerAssignment
     };
