@@ -42,23 +42,23 @@ const v = volunteer || {};
 
   <!-- ================= PROJECT ================= -->
   <div class="mb-3">
-    <label class="form-label fw-semibold">
-      <i class="fa-solid fa-clipboard-list me-1 text-secondary"></i> Project
-    </label>
-    <input
-      type="text"
-      class="form-control"
-      value="<%= project.project_title %>"
-      if="mode === 'edit'
-        ? readonly
-        : ''"
-    >
-    <input
-      type="hidden"
-      name="projectId"
-      value="<%= project.project_id %>"
-    >
-  </div>
+  <label class="form-label fw-semibold">
+    <i class="fa-solid fa-clipboard-list me-1 text-secondary"></i> Project
+  </label>
+
+  <input
+    type="text"
+    class="form-control"
+    value="<%= project.project_title %>"
+    <%= mode !== 'edit' ? 'readonly' : '' %>
+  >
+
+  <input
+    type="hidden"
+    name="projectId"
+    value="<%= project.project_id %>"
+  >
+</div>
 
   <!-- ================= ROLE TYPE ================= -->
   <div class="mb-3">
