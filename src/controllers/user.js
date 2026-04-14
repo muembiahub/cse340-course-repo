@@ -221,12 +221,6 @@ const volunteerValidation = [
     .withMessage("Hours must be at least 1")
     .toInt(),
 
-  // Start date
-  body("dateToStart")
-    .notEmpty()
-    .withMessage("Date to start is required")
-    .isISO8601()
-    .withMessage("Date must be a valid date")
 ];
 
 // =======================================================
@@ -245,7 +239,7 @@ const showVolunteerListPage = async (req, res) => {
     const volunteers = await getVolunteerProjects(user.user_id);
 
     res.render("dashboard/volunteer-list", {
-      title: "Volunteer List",
+      title: `Volunteer List for ${user.name}`,
       volunteers
     });
   } catch (error) {
@@ -354,7 +348,7 @@ const processVolunteerRegistrationForm = async (req, res) => {
       });
     }
 
-    const { roleType, hoursCommitted, dateToStart } = req.body;
+    const { roleType, hoursCommitted} = req.body;
 
     // ---------------------------------------------------
     // 5. Prevent duplicate registration
@@ -382,8 +376,7 @@ const processVolunteerRegistrationForm = async (req, res) => {
       projectId,
       roleType,
       hoursCommitted,
-      "Pending",
-      dateToStart
+      "Pending",           // default status
     );
 
     // ---------------------------------------------------
@@ -427,7 +420,7 @@ const processVolunteerUpdateForm = async (req, res) => {
     }
 
     // 3️⃣ Extract form data
-    const { roleType, hoursCommitted, dateToStart, mode } = req.body;
+    const { roleType, hoursCommitted, mode } = req.body;
 
     // 4️⃣ Ensure correct mode
     if (mode !== "edit") {
@@ -441,8 +434,7 @@ const processVolunteerUpdateForm = async (req, res) => {
       projectId,
       roleType,
       parseInt(hoursCommitted, 10),
-      "Pending",           // status reset after edit
-      dateToStart
+      "Pending"          // status reset after edit
     );
 
     // 6️⃣ Success feedback
@@ -477,7 +469,7 @@ const processVolunteerDeleteprojectId = async (req, res) => {
     const projectId = parseInt(req.params.projectId, 10);
     if (Number.isNaN(projectId)) {
       req.flash("error", "Invalid project ID.");
-      return res.redirect("/dashboard/volunteer");
+      return res.redirect("/projectsdetails/" + req.params.projectId);
     }
 
     const deleted =
@@ -489,11 +481,11 @@ const processVolunteerDeleteprojectId = async (req, res) => {
       req.flash("success", "Volunteer assignment deleted successfully.");
     }
 
-    res.redirect("/dashboard/volunteer");
+    res.redirect("/projectsdetails/" + projectId);
   } catch (error) {
     console.error("Error deleting volunteer assignment:", error);
     req.flash("error", "Unable to delete volunteer assignment.");
-    res.redirect("/dashboard/volunteer");
+    res.redirect("/projectsdetails/" + req.params.projectId);
   }
 };
 

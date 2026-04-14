@@ -7,6 +7,7 @@ import { getAllOrganizations } from '../models/organizations.js';
 
 import { getAllCategories } from '../models/categories.js';
 import { updateProject, updateProjectCategories} from '../models/projects.js';
+import { getAllVolunteers } from '../models/user.js';
 
 
 
@@ -46,6 +47,7 @@ const showProjectDetailsPage = async (req, res) => {
     const project = await getProjectsDetails(req.params.id);
     const categories = await getAllCategories(); // ✅ REQUIRED
     const organizations = await getAllOrganizations(); // ✅ REQUIRED
+    const volunteers = await getAllVolunteers(req.params.id); // ✅ NEW
 
     // Comme getProjectsDetails retourne un tableau, on prend la première ligne
     const projectData = project ? project : null;
@@ -59,7 +61,8 @@ const showProjectDetailsPage = async (req, res) => {
       title, 
       project: projectData,
       categories,
-       organizations });
+       organizations,
+       volunteers });
   } catch (err) {
     console.error('Error showing project details:', err);
     res.status(500).render('errors', { message: 'Erreur serveur lors du chargement du projet' });

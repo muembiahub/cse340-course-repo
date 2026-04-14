@@ -76,23 +76,22 @@
           </li>
 
           <% if (isLoggedIn) { %>
-        
-            <!-- Role Badge -->
+            <!-- Volunteer page  -->
+            <% if (role === "admin") { %>
+              <!-- Admin Dashboard -->
+              <li class="nav-item">
+                <a class="nav-link" href="/dashboard/all-volunteers">
+                  <i class="fa-solid fa-shield-halved me-1"></i>All Volunteers
+                </a>
+              </li>
+            <% } %>
+             <!-- Role Badge -->
             <li class="nav-item">
               <span class="badge bg-light text-primary px-3 py-2">
                 <i class="fa-solid fa-user-shield me-1"></i>
                 <%= role %>
               </span>
             </li>
-            <!-- Volunteer page  -->
-
-
-            <li class="nav-item">
-              <a class="nav-link" href="/dashboard/volunteer">
-                <i class="fa-solid fa-user-group me-1"></i>Volunteer
-              </a>
-            </li>
-
             <!-- Logout -->
             <li class="nav-item">
               <a class="btn btn-outline-light btn-sm ms-lg-2" href="/logout">

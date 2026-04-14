@@ -95,7 +95,7 @@ router.get('/assign-categories/:projectId',requireRole('admin'), showAssignCateg
 router.post('/assign-categories/:projectId', requireRole('admin'), processAssignCategoriesForm);
 
 // Show the volunteer registration form
-router.get('/volunteer/registration/:projectId', showVolunteerRegistrationForm);
+router.get('/volunteer/registration/:projectId',requireLogin, showVolunteerRegistrationForm);
 
 // Handle new volunteer registration
 router.post('/volunteer/registration/:projectId', volunteerValidation,requireLogin, processVolunteerRegistrationForm);

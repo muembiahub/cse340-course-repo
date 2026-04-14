@@ -1,9 +1,9 @@
-<%- include('partials/header', { title: title }) %>
+<%- include('partials/header', { title }) %>
 
 <main class="container my-5">
 
-  <!-- Page Header -->
-  <div class="mb-4">
+  <!-- ================= PAGE HEADER ================= -->
+  <header class="mb-4">
     <h1 class="mb-1">
       <i class="fa-solid fa-diagram-project me-2 text-primary"></i>
       <%= title %>
@@ -11,48 +11,40 @@
     <p class="text-muted mb-0">
       Detailed information about this community service project
     </p>
-  </div>
+  </header>
 
-  <!-- Tabs -->
+  <!-- ================= TABS ================= -->
   <ul class="nav nav-tabs" id="projectTabs" role="tablist">
-
-    <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="details-tab"
-        data-bs-toggle="tab" data-bs-target="#details"
-        type="button" role="tab">
+    <li class="nav-item">
+      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#details">
         <i class="fa-solid fa-circle-info me-1"></i> Details
       </button>
     </li>
 
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="categories-tab"
-        data-bs-toggle="tab" data-bs-target="#categories"
-        type="button" role="tab">
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#categories">
         <i class="fa-solid fa-tags me-1"></i> Categories
       </button>
     </li>
 
-    <li class="nav-item" role="presentation">
+    <li class="nav-item">
       <% if (user && user.role_name === 'admin') { %>
-        <button class="nav-link" id="edit-tab"
-          data-bs-toggle="tab" data-bs-target="#edit"
-          type="button" role="tab">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#edit">
           <i class="fa-solid fa-pen-to-square me-1"></i> Edit Project
         </button>
       <% } else { %>
-        <button class="nav-link disabled" type="button" aria-disabled="true">
+        <button class="nav-link disabled" type="button">
           <i class="fa-solid fa-lock me-1"></i> Edit (Admins Only)
         </button>
       <% } %>
     </li>
-
   </ul>
 
-  <!-- Tab Content -->
+  <!-- ================= TAB CONTENT ================= -->
   <div class="tab-content mt-4">
 
-    <!-- Details -->
-    <div class="tab-pane fade show active" id="details" role="tabpanel">
+    <!-- ========== DETAILS TAB ========== -->
+    <section class="tab-pane fade show active" id="details">
       <div class="card shadow-sm">
         <div class="card-body">
 
@@ -63,7 +55,9 @@
 
           <p><strong>Description:</strong> <%= project.description %></p>
           <p><strong>Location:</strong> <%= project.location %></p>
-          <p><strong>Date:</strong>
+
+          <p>
+            <strong>Date:</strong>
             <%= new Date(project.project_date).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',
@@ -79,43 +73,92 @@
               <%= project.organization_name %>
             </a>
           </p>
-          <p>
-  <strong>Want to Involve in?</strong>
-  <a class="btn btn-link" data-bs-toggle="collapse" href="#volunteerForm<%= project.project_id %>">
-    Click here to register
-  </a>
-</p>
 
-<div class="collapse" id="volunteerForm<%= project.project_id %>">
-<% if (user) { %>
-  <%- include('partials/volunteer-registration', {
-    mode: 'create',
-    project_id: project.project_id,
-    project: project,
-    volunteer: null,
-    user: user
-  }) %>
-<% } else { %>
-  <p class="text-warning">Please log in to register as a volunteer.</p>
-<% } %>
-</div>
+          <!-- ================= VOLUNTEER ASSIGNMENT ================= -->
+          <p>
+            <strong>Volunteer assigned:</strong>
+
+            <% if (volunteers && volunteers.length > 0) { %>
+
+              <a href="/dashboard/volunteer/"
+                 class="link-primary fw-semibold">
+                <i class="fa-solid fa-user me-1"></i>
+                <%= volunteers[0].name %>
+              </a>
+              <!-- if user in session == to volunteer user_id show delete button  -->
+              <% if (user && user.user_id === volunteers[0].user_id) { %>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  data-bs-toggle="modal"
+                  data-bs-target="#deleteModal"
+                  data-project-id="<%= project.project_id %>"
+                  data-project-title="<%= project.project_title %>">
+                  <i class="fa-solid fa-trash"></i> Withdraw
+                </button>
+              <% } %>
+            <% } else { %>
+
+              No volunteer assigned yet.
+
+              <% if (user) { %>
+                <button
+                  type="button"
+                  class=" btn btn-primary btn-sm ms-2"
+                  onclick="openRegistrationForm()">
+                  Sign up as volunteer
+                </button>
+              <% } %>
+
+            <% } %>
+          </p>
+
+          <!-- ================= REGISTRATION FORM (HIDDEN) ================= -->
+          <div id="registrationform" class="mt-4 d-none">
+
+            <% if (!user) { %>
+
+              <div class="alert alert-warning">
+                <i class="fa-solid fa-circle-exclamation me-1"></i>
+                You must be logged in to sign up as a volunteer.
+                <a href="/login" class="link-primary fw-semibold">Log in</a>
+              </div>
+
+            <% } else if (volunteers && volunteers.length > 0) { %>
+
+              <div class="alert alert-info">
+                <i class="fa-solid fa-info-circle me-1"></i>
+                A volunteer is already assigned to this project.
+              </div>
+
+            <% } else { %>
+
+              <%- include('partials/volunteer-registration', {
+                project_id: project.project_id,
+                mode: 'create',
+                volunteer: null,
+                user
+              }) %>
+
+            <% } %>
+
+          </div>
 
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Categories -->
-    <div class="tab-pane fade" id="categories" role="tabpanel">
+    <!-- ========== CATEGORIES TAB ========== -->
+    <section class="tab-pane fade" id="categories">
       <h4 class="mb-3">
         <i class="fa-solid fa-tags me-1 text-secondary"></i>
         Categories
       </h4>
 
       <% if (project.category_names?.length) { %>
-        <% project.category_names.forEach((cat, i) => { %>
+        <% project.category_names.forEach((name, i) => { %>
           <a href="/categorydetails/<%= project.category_ids[i] %>"
              class="badge bg-primary me-1 mb-1">
-            <%= cat %>
+            <%= name %>
           </a>
         <% }) %>
       <% } else { %>
@@ -124,16 +167,15 @@
           No categories assigned to this project.
         </div>
       <% } %>
-    </div>
+    </section>
 
-    <!-- Edit -->
-    <div class="tab-pane fade" id="edit" role="tabpanel">
+    <!-- ========== EDIT TAB ========== -->
+    <section class="tab-pane fade" id="edit">
       <% if (user && user.role_name === 'admin') { %>
 
         <div class="card shadow-sm">
           <div class="card-header bg-warning text-dark">
-            <i class="fa-solid fa-pen-to-square me-1"></i>
-            Edit Project
+            <i class="fa-solid fa-pen-to-square me-1"></i> Edit Project
           </div>
           <div class="card-body">
 
@@ -155,10 +197,73 @@
         </div>
 
       <% } %>
-    </div>
+    </section>
 
   </div>
-
 </main>
+
+<!-- DELETE CONFIRMATION MODAL -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-danger">
+
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">
+          <i class="fa-solid fa-triangle-exclamation me-1"></i>
+          Withdraw from Project
+        </h5>
+        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <p>
+          Are you sure you want to withdraw from
+          <strong id="deleteProjectTitle"></strong>?
+        </p>
+        <p class="text-danger mb-0">This action cannot be undone.</p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+
+        <form id="deleteForm" method="POST">
+          <button type="submit" class="btn btn-danger">
+            <i class="fa-solid fa-trash me-1"></i> Withdraw
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const deleteModal = document.getElementById('deleteModal');
+
+  deleteModal.addEventListener('show.bs.modal', event => {
+    const button = event.relatedTarget;
+    const projectId = button.getAttribute('data-project-id');
+    const projectTitle = button.getAttribute('data-project-title');
+
+    document.getElementById('deleteProjectTitle').textContent = projectTitle;
+    document.getElementById('deleteForm').action =
+      `/volunteer/delete/${projectId}`;
+  });
+</script>
+
+<!-- ================= TOGGLE REGISTRATION FORM ================= -->
+<script>
+  function openRegistrationForm() {
+    const form = document.getElementById('registrationform');
+    if (form) {
+      form.classList.remove('d-none');
+      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+
+</script>
 
 <%- include('partials/footer') %>

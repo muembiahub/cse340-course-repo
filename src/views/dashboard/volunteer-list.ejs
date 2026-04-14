@@ -15,9 +15,7 @@
             <th>Date</th>
             <th>Role Type</th>
             <th>Hours</th>
-            <th>Start Date</th>
             <th>Status</th>
-            <th class="text-center">Actions</th>
           </tr>
         </thead>
 
@@ -38,12 +36,6 @@
               <td><%= v.hours_committed %></td>
 
               <td>
-                <%= v.date_to_start
-                  ? new Date(v.date_to_start).toISOString().split('T')[0]
-                  : '' %>
-              </td>
-
-              <td>
                 <span class="badge
                   <%= v.volunteer_status === 'Active'
                     ? 'bg-success'
@@ -54,33 +46,7 @@
                 </span>
               </td>
 
-              <td class="text-center">
-                <!-- Edit Button -->
-                <a href="#volunteerForm-<%= v.project_id %>" class="btn btn-link" data-bs-toggle="collapse">
-                  <i class="fa-solid fa-pen-to-square"></i> Edit
-                </a>
-
-                <!-- Edit Form -->
-                <div class="collapse mt-2" id="volunteerForm-<%= v.project_id %>">
-                  <%- include('../partials/volunteer-registration', {
-                    mode: 'edit',
-                    project_id: v.project_id,
-                    project: v,
-                    volunteer: v,
-                    user: user
-                  }) %>
-                </div>
-
-                <!-- Withdraw Button -->
-                <button
-                  class="btn btn-sm btn-outline-danger"
-                  data-bs-toggle="modal"
-                  data-bs-target="#deleteModal"
-                  data-project-id="<%= v.project_id %>"
-                  data-project-title="<%= v.project_title %>">
-                  <i class="fa-solid fa-trash"></i> Withdraw
-                </button>
-              </td>
+              
             </tr>
           <% }) %>
         </tbody>
@@ -95,56 +61,4 @@
 
   </div>
 </main>
-
-<!-- DELETE CONFIRMATION MODAL -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-danger">
-
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title">
-          <i class="fa-solid fa-triangle-exclamation me-1"></i>
-          Withdraw from Project
-        </h5>
-        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-      </div>
-
-      <div class="modal-body">
-        <p>
-          Are you sure you want to withdraw from
-          <strong id="deleteProjectTitle"></strong>?
-        </p>
-        <p class="text-danger mb-0">This action cannot be undone.</p>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">
-          Cancel
-        </button>
-
-        <form id="deleteForm" method="POST">
-          <button type="submit" class="btn btn-danger">
-            <i class="fa-solid fa-trash me-1"></i> Withdraw
-          </button>
-        </form>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<script>
-  const deleteModal = document.getElementById('deleteModal');
-
-  deleteModal.addEventListener('show.bs.modal', event => {
-    const button = event.relatedTarget;
-    const projectId = button.getAttribute('data-project-id');
-    const projectTitle = button.getAttribute('data-project-title');
-
-    document.getElementById('deleteProjectTitle').textContent = projectTitle;
-    document.getElementById('deleteForm').action =
-      `/volunteer/delete/${projectId}`;
-  });
-</script>
-
 <%- include('../partials/footer') %>

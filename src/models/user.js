@@ -159,11 +159,13 @@ const getVolunteerProjects = async (userId) => {
       p.project_date,
       v.role_type,
       v.hours_committed,
-      v.date_to_start,
-      v.status AS volunteer_status
+      v.status AS volunteer_status,
+      u.name
     FROM service_projects p
     INNER JOIN volunteer v
       ON p.project_id = v.project_id
+    JOIN users u
+      ON v.user_id = u.user_id
     WHERE v.user_id = $1
     ORDER BY p.project_date DESC
   `;
@@ -175,15 +177,11 @@ const getVolunteerProjects = async (userId) => {
 /**
  * Get all volunteers assigned to a project
  */
-const getProjectVolunteers = async (projectId) => {
-  const sql = `
+const getAllVolunteers = async (projectId) => {
+   const sql = `
     SELECT
       u.user_id,
-      u.name,
-      v.role_type,
-      v.hours_committed,
-      v.status AS volunteer_status,
-      v.volunteered_at
+      u.name
     FROM users u
     INNER JOIN volunteer v
       ON u.user_id = v.user_id
@@ -194,6 +192,7 @@ const getProjectVolunteers = async (projectId) => {
   const { rows } = await db.query(sql, [projectId]);
   return rows;
 };
+
 
 /**
  * Get a volunteer assignment by user and project
@@ -220,8 +219,7 @@ const registerVolunteer = async (
   projectId,
   roleType,
   hoursCommitted,
-  status = "Pending",
-  dateToStart
+  status = "Pending"
 ) => {
   const sql = `
     INSERT INTO volunteer (
@@ -229,10 +227,9 @@ const registerVolunteer = async (
       project_id,
       role_type,
       hours_committed,
-      status,
-      date_to_start
+      status
     )
-    VALUES ($1, $2, $3, $4, $5, $6)
+    VALUES ($1, $2, $3, $4, $5)
     RETURNING user_id, project_id
   `;
 
@@ -241,8 +238,7 @@ const registerVolunteer = async (
     projectId,
     roleType,
     hoursCommitted,
-    status,
-    dateToStart
+    status
   ]);
 
   return rows[0];
@@ -279,16 +275,14 @@ const updateVolunteerAssignment = async (
   projectId,
   roleType,
   hoursCommitted,
-  status = "Pending",
-  dateToStart
+  status = "Pending"
 ) => {
   const sql = `
     UPDATE volunteer
     SET
       role_type = $1,
       hours_committed = $2,
-      status = $3,
-      date_to_start = $4
+      status = $3
     WHERE
       user_id = $5
       AND project_id = $6
@@ -299,7 +293,6 @@ const updateVolunteerAssignment = async (
     roleType,
     hoursCommitted,
     status,
-    dateToStart,
     userId,
     projectId
   ]);
@@ -319,7 +312,7 @@ export { createUser ,
      verifyPassword , authenticateUser , 
      requireLogin ,getAllRoles,
       updateUserRole,
-     getProjectVolunteers,
+     getAllVolunteers,
      getVolunteerProjects,
      getVolunteerByUserAndProject,
      registerVolunteer,

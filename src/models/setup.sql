@@ -145,3 +145,33 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+
+--  ============================================= create table for week 6 assignment  =============================================
+
+-- Table: public.volunteer
+
+-- DROP TABLE IF EXISTS public.volunteer;
+
+CREATE TABLE IF NOT EXISTS public.volunteer
+(
+    user_id integer NOT NULL,
+    project_id integer NOT NULL,
+    volunteered_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    role_type character varying(100) COLLATE pg_catalog."default",
+    hours_committed integer,
+    status character varying(50) COLLATE pg_catalog."default",
+    CONSTRAINT volunteer_pkey PRIMARY KEY (user_id, project_id),
+    CONSTRAINT volunteer_project_id_fkey FOREIGN KEY (project_id)
+        REFERENCES public.service_projects (project_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT volunteer_user_id_fkey FOREIGN KEY (user_id)
+        REFERENCES public.users (user_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.volunteer
+    OWNER to muembia_cse340_db_lbdb_user;
